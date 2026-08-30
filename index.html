@@ -148,7 +148,7 @@
 
         .puzzle-grid-layout {
             display: grid;
-            grid-template-columns: 1fr 310px;
+            grid-template-columns: minmax(0, 1fr) 310px;
             gap: 1.6rem;
             align-items: start;
         }
@@ -194,7 +194,7 @@
             letter-spacing: 0.1em;
         }
 
-        /* 8 Rows x 6 Cols Board */
+        /* 5 Rows x 5 Cols Board */
         .board-frame {
             background: #eddcc4;
             border: 2px solid rgba(198, 138, 44, 0.6);
@@ -205,10 +205,10 @@
 
         #puzzleBoard {
             width: 100%;
-            aspect-ratio: 6 / 8;
+            aspect-ratio: 1 / 1;
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(8, 1fr);
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
             gap: 3px;
             border-radius: 6px;
             overflow: hidden;
@@ -276,13 +276,13 @@
 
         #piecesPool {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
 
         .puzzle-piece {
             position: relative;
-            aspect-ratio: 1 / 1.25;
+            aspect-ratio: 1 / 1;
             overflow: hidden;
             border: 2px solid rgba(198, 138, 44, 0.5);
             border-radius: 8px;
@@ -472,7 +472,7 @@
         </section>
 
         <!-- =========================================================
-             STAGE 2: PUZZLE #01 (8x6 IMAGE PUZZLE)
+             STAGE 2: PUZZLE #01 (5x5 IMAGE PUZZLE)
              ========================================================= -->
         <section id="puzzleSection" class="quest-section">
             <div class="puzzle-header">
@@ -511,7 +511,7 @@
                                 <span>Placed</span>
                             </div>
                             <div class="puzzle-stat-box">
-                                <strong id="totalCount">48</strong>
+                                <strong id="totalCount">25</strong>
                                 <span>Total</span>
                             </div>
                             <div class="puzzle-stat-box">
@@ -529,7 +529,7 @@
                     <div class="glass-card pieces-tray">
                         <div class="tray-head">
                             <strong>Puzzle Pieces</strong>
-                            <span id="remainingCountText">48 pieces remaining</span>
+                            <span id="remainingCountText">25 pieces remaining</span>
                         </div>
                         <div id="piecesPool"></div>
                     </div>
@@ -632,8 +632,8 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // Check URL hash or state to skip welcome if already done
-            if (window.location.hash === '#puzzle-section' || state.welcomeDone) {
+            // Step 2 is available only after the Step 1 questions are completed.
+            if (state.welcomeDone) {
                 showScreen(puzzleSection);
                 injectQuestHUD(2);
             }
@@ -659,10 +659,10 @@
                 QuestState.setWelcomeDone();
                 showScreen(puzzleSection);
                 injectQuestHUD(2);
-                showToast("Puzzle #01: Assemble all 48 pieces! 🧩");
+                showToast("Puzzle #01: Assemble all 25 pieces! 🧩");
             });
 
-            // --- PUZZLE #01 ENGINE (8x6) ---
+            // --- PUZZLE #01 ENGINE (5x5) ---
             const ROWS = 5;
             const COLS = 5;
             const TOTAL_PIECES = ROWS * COLS;

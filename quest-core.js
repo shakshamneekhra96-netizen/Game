@@ -78,6 +78,50 @@ const QuestState = {
 };
 
 /* ---------------------------------------------------------
+   QUEST ROUTE GUARD
+   --------------------------------------------------------- */
+function enforceQuestProgress() {
+    const page = window.location.pathname.split('/').pop().toLowerCase() || 'index.html';
+    const state = QuestState.get();
+
+    // Step 2 cannot be opened from the URL until Step 1 is complete.
+    if (page === 'index.html' && window.location.hash === '#puzzle-section' && !state.welcomeDone) {
+        window.location.replace('index.html');
+        return false;
+    }
+
+    const lockedRoutes = {
+        'hub.html': {
+            allowed: state.imagePuzzleDone,
+            fallback: 'index.html#puzzle-section'
+        },
+        'password.html': {
+            allowed: state.imagePuzzleDone,
+            fallback: 'index.html#puzzle-section'
+        },
+        'cyber.html': {
+            allowed: state.imagePuzzleDone && state.wordGameDone,
+            fallback: state.imagePuzzleDone ? 'hub.html' : 'index.html#puzzle-section'
+        },
+        'final.html': {
+            allowed: state.imagePuzzleDone && state.wordGameDone && state.cyberQuestDone,
+            fallback: state.imagePuzzleDone ? 'hub.html' : 'index.html#puzzle-section'
+        }
+    };
+
+    const route = lockedRoutes[page];
+    if (route && !route.allowed) {
+        window.location.replace(route.fallback);
+        return false;
+    }
+
+    return true;
+}
+
+// Protect direct URL navigation as well as the visible progress controls.
+enforceQuestProgress();
+
+/* ---------------------------------------------------------
    AUDIO SYNTHESIZER (Web Audio API - No extra assets needed)
    --------------------------------------------------------- */
 const QuestAudio = {
@@ -177,7 +221,11 @@ function injectQuestHUD(currentStepId = 1) {
         const icon = isCompleted && !isCurrent ? '✓' : step.id;
 
         // Make accessible link if allowed
-        const canNavigate = step.id <= 3 || (step.id === 4 && state.imagePuzzleDone) || (step.id === 5 && state.wordGameDone) || (step.id === 6 && state.cyberQuestDone);
+        const canNavigate = step.id === 1
+            || (step.id === 2 && state.welcomeDone)
+            || ((step.id === 3 || step.id === 4) && state.imagePuzzleDone)
+            || (step.id === 5 && state.wordGameDone)
+            || (step.id === 6 && state.cyberQuestDone);
         const tag = canNavigate ? `<a href="${step.url}" class="${classes}" title="${step.name}">${icon}</a>` : `<span class="${classes}" title="${step.name}">${icon}</span>`;
 
         stepsHtml += tag;
