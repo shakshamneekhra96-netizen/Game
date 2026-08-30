@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Code Breaker Cryptex - Birthday Quest for Anjali</title>
+    <link rel="stylesheet" href="quest-core.css">
+    <style>
+        .game-wrapper {
+            width: min(100%, 580px);
+            margin: 1.5rem auto 3.5rem auto;
+            padding: 1rem;
+        }
+
+        .game-card {
+            background: var(--card-bg-warm);
+            border: 2px solid rgba(198, 138, 44, 0.55);
+            padding: clamp(1.8rem, 4vw, 2.5rem);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+        }
+
+        .guess-input {
+            appearance: none;
+            text-align: center;
+            letter-spacing: 0.4em;
+            font-size: 2rem;
+            font-family: monospace;
+            font-weight: 800;
+            border: 2px solid rgba(198, 138, 44, 0.6);
+            background-color: #fffaf0;
+            color: #8b263e;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            border-radius: var(--radius-md);
+            width: min(100%, 240px);
+            padding: 0.8rem 1rem;
+            outline: none;
+            margin: 1.2rem auto;
+            box-shadow: inset 0 2px 6px rgba(74, 44, 23, 0.1);
+        }
+
+        .guess-input:focus {
+            border-color: #8b263e;
+            box-shadow: 0 0 20px rgba(139, 38, 62, 0.25);
+        }
+
+        .attempt-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-pill);
+            background: rgba(198, 138, 44, 0.15);
+            border: 1px solid rgba(198, 138, 44, 0.4);
+            color: #8b263e;
+            font-family: var(--font-heading);
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .history-log-box {
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 0.8rem;
+            background: #fffaf0;
+            border: 1px solid rgba(198, 138, 44, 0.35);
+            border-radius: var(--radius-md);
+            margin-top: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0.7rem 0.9rem;
+            background: rgba(255, 248, 235, 0.95);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(198, 138, 44, 0.25);
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .history-code {
+            font-family: monospace;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #8b263e;
+            letter-spacing: 0.1em;
+        }
+
+        .history-feedback {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @keyframes subtleFlash {
+            0% { box-shadow: var(--shadow-soft); }
+            50% { box-shadow: 0 10px 35px rgba(139, 38, 62, 0.4); }
+            100% { box-shadow: var(--shadow-soft); }
+        }
+
+        .flash {
+            animation: subtleFlash 0.3s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quest-ambient-bg"></div>
+
+    <main class="game-wrapper">
+
+        <div class="game-card" id="game-card">
+            <div class="eyebrow" style="color: var(--accent-crimson);">🔐 CIPHER QUEST · LEVEL 03</div>
+            <h1 style="font-size: clamp(2rem, 5.5vw, 2.8rem); margin: 0.4rem 0 0.8rem 0; color: #2b180d;">
+                4-Digit Code Breaker
+            </h1>
+
+            <p id="feedback-message" style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 1.2rem;">
+                Guess the secret 4-digit code (0-9). Digits do not repeat.<br>
+                <strong style="color: #2d6a4f;">Hits:</strong> Correct digit & right position · <strong style="color: #c68a2c;">Clues:</strong> Correct digit, wrong position.
+            </p>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.6rem;">
+                <input type="number" id="guess-input" maxlength="4" placeholder="_ _ _ _" class="guess-input"
+                    oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
+
+                <button id="submit-button" onclick="submitGuess()" class="btn-quest btn-quest-gold"
+                    style="font-size: 1.05rem; padding: 0.85rem 2.4rem;">
+                    Submit Guess 🚀
+                </button>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-family: var(--font-heading); font-size: 1.1rem; color: #2b180d; font-weight: 700;">Attempt History</span>
+                    <span class="attempt-badge">
+                        <span id="guesses-left">10</span> / 10 left
+                    </span>
+                </div>
+
+                <div id="history-log" class="history-log-box">
+                    <div style="color: var(--text-dim); font-size: 0.9rem; padding: 0.8rem; text-align: center;">
+                        No guesses yet. Enter 4 unique digits above!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =========================================================
+         WIN/LOSE MODAL
+         ========================================================= -->
+    <div id="result-overlay" class="quest-modal-backdrop">
+        <div class="quest-modal" id="result-box">
+            <div id="result-eyebrow" class="eyebrow" style="color: #2d6a4f; font-size: 1.3rem;">🎉 CRYPTEX UNLOCKED!</div>
+            <h2 id="final-message" style="font-size: 2rem; margin: 0.4rem 0 0.8rem 0; color: #2b180d;">Code Cracked! 🔓</h2>
+            <p id="final-submessage" style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1rem;">
+                You conquered every single challenge on the journey!
+            </p>
+            <p id="secret-code-display" style="font-family: monospace; font-size: 2.2rem; color: #8b263e; font-weight: 800; letter-spacing: 0.15em; margin-bottom: 1.5rem;"></p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button id="openBirthdayMsgBtn" onclick="openFinale()" class="btn-quest btn-quest-gold" style="width: 100%; font-size: 1.1rem; padding: 0.9rem;">
+                    Open Your Birthday Finale ❤️ ➔
+                </button>
+                <button onclick="initGame()" class="btn-quest btn-quest-secondary" style="width: 100%; padding: 0.7rem;">
+                    ↻ Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         LOCKED ALERT MODAL (IF WORD GAME NOT DONE)
+         ========================================================= -->
+    <div id="lockedModal" class="quest-modal-backdrop">
+        <div class="quest-modal">
+            <div class="eyebrow" style="color: var(--accent-crimson);">🔒 RESTRICTED ACCESS</div>
+            <h2 style="font-size: 1.7rem; margin: 0.5rem 0 0.8rem 0; color: #2b180d;">Word Game Incomplete</h2>
+            <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.5; margin-bottom: 1.8rem;">
+                The Cyber Quest terminal is encrypted. Complete the <strong>Word Game</strong> first, or unlock and play directly now!
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <button id="directUnlockCyberBtn" class="btn-quest btn-quest-gold" style="width: 100%;">
+                    Unlock & Play Cyber Quest 🔓
+                </button>
+                <a href="hub.html" class="btn-quest btn-quest-secondary" style="width: 100%;">
+                    Return to Challenge Hub ➔
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="quest-core.js"></script>
+    <script>
+        // --- Configuration and State ---
+        const CODE_LENGTH = 4;
+        const MAX_ATTEMPTS = 10;
+
+        let secretCode = [];
+        let attemptsRemaining = MAX_ATTEMPTS;
+        let gameActive = false;
+
+        // --- DOM Elements ---
+        const gameCard = document.getElementById('game-card');
+        const guessInput = document.getElementById('guess-input');
+        const historyLog = document.getElementById('history-log');
+        const guessesLeftDisplay = document.getElementById('guesses-left');
+        const resultOverlay = document.getElementById('result-overlay');
+        const finalMessage = document.getElementById('final-message');
+        const finalSubmessage = document.getElementById('final-submessage');
+        const secretCodeDisplay = document.getElementById('secret-code-display');
+        const submitButton = document.getElementById('submit-button');
+        const openBirthdayMsgBtn = document.getElementById('openBirthdayMsgBtn');
+
+        function checkAccess() {
+            const state = QuestState.get();
+            if (!state.wordGameDone) {
+                document.getElementById('lockedModal').classList.add('show');
+                return false;
+            }
+            return true;
+        }
+
+        function generateCode() {
+            const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+            for (let i = digits.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [digits[i], digits[j]] = [digits[j], digits[i]];
+            }
+            secretCode = digits.slice(0, CODE_LENGTH).map(d => d.toString());
+        }
+
+        function checkGuess(guessString) {
+            const guess = Array.from(guessString);
+            let hits = 0;
+            let clues = 0;
+            const codeCopy = [...secretCode];
+
+            // 1. Check for HITS (Correct position)
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                if (guess[i] === codeCopy[i]) {
+                    hits++;
+                    guess[i] = 'H';
+                    codeCopy[i] = 'H';
+                }
+            }
+
+            // 2. Check for CLUES (Correct digit, wrong position)
+            for (let i = 0; i < CODE_LENGTH; i++) {
+                if (guess[i] !== 'H') {
+                    const codeIndex = codeCopy.indexOf(guess[i]);
+                    if (codeIndex > -1) {
+                        clues++;
+                        codeCopy[codeIndex] = 'C';
+                    }
+                }
+            }
+
+            return { hits, clues };
+        }
+
+        function submitGuess() {
+            if (!gameActive) return;
+
+            const guessString = guessInput.value.trim();
+
+            if (guessString.length !== CODE_LENGTH || isNaN(guessString)) {
+                QuestAudio.playTone(240, 'sawtooth', 0.15, 0.1);
+                showToast("Please enter a 4-digit number (0-9).");
+                return;
+            }
+
+            const uniqueDigits = new Set(Array.from(guessString));
+            if (uniqueDigits.size !== CODE_LENGTH) {
+                QuestAudio.playTone(240, 'sawtooth', 0.15, 0.1);
+                showToast("All 4 digits must be unique! (e.g. 1234, not 1123).");
+                return;
+            }
+
+            attemptsRemaining--;
+            guessesLeftDisplay.innerText = attemptsRemaining;
+            QuestAudio.playClick();
+
+            const feedback = checkGuess(guessString);
+            logAttempt(guessString, feedback.hits, feedback.clues, MAX_ATTEMPTS - attemptsRemaining);
+
+            if (feedback.hits >= 3) {
+                gameCard.classList.add('flash');
+                setTimeout(() => gameCard.classList.remove('flash'), 300);
+            }
+
+            if (feedback.hits === CODE_LENGTH) {
+                endGame(true);
+            } else if (attemptsRemaining <= 0) {
+                endGame(false);
+            }
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function logAttempt(guess, hits, clues, attemptNumber) {
+            if (historyLog.children.length === 1 && historyLog.children[0].textContent.includes('No guesses yet')) {
+                historyLog.innerHTML = '';
+            }
+
+            const logEntry = document.createElement('div');
+            logEntry.className = 'history-row';
+
+            const totalCorrect = hits + clues;
+            let summaryMessage;
+
+            if (totalCorrect === 0) {
+                summaryMessage = "None of the digits are in the code.";
+            } else {
+                const digitWord = totalCorrect === 1 ? 'digit' : 'digits';
+                const hitWord = hits === 1 ? 'is' : 'are';
+                summaryMessage = `${totalCorrect} correct ${digitWord}. ${hits} ${hitWord} in the right spot.`;
+            }
+
+            logEntry.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Attempt #${attemptNumber}</span>
+                    <span class="history-code">${guess}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">${summaryMessage}</span>
+                    <div>
+                        <span style="color: #2d6a4f; font-weight: 700; font-size: 0.85rem;">✅ ${hits} Hit${hits === 1 ? '' : 's'}</span> · 
+                        <span style="color: #c68a2c; font-weight: 700; font-size: 0.85rem;">🟨 ${clues} Clue${clues === 1 ? '' : 's'}</span>
+                    </div>
+                </div>
+            `;
+            historyLog.prepend(logEntry);
+            historyLog.scrollTop = 0;
+        }
+
+        function endGame(won) {
+            gameActive = false;
+            secretCodeDisplay.innerText = `Secret Code: ${secretCode.join('')}`;
+
+            if (won) {
+                QuestState.setCyberQuestDone();
+                triggerQuestConfetti(5000);
+                document.getElementById('result-eyebrow').textContent = "🎉 CODE CRACKED!";
+                finalMessage.innerText = "Master Cryptex Solved! 🔓";
+                finalSubmessage.innerText = "You made it to the end of all the challenges.";
+                openBirthdayMsgBtn.style.display = 'block';
+            } else {
+                QuestAudio.playTone(180, 'sawtooth', 0.4, 0.2);
+                document.getElementById('result-eyebrow').textContent = "🔒 ATTEMPTS EXHAUSTED";
+                finalMessage.innerText = "Almost! Try Again 💭";
+                finalSubmessage.innerText = "Don't worry, you've got this! Give it another shot or proceed to your Birthday Finale.";
+                openBirthdayMsgBtn.style.display = 'block';
+            }
+
+            setTimeout(() => {
+                resultOverlay.classList.add('show');
+            }, 600);
+        }
+
+        function openFinale() {
+            QuestAudio.playSuccess();
+            window.location.href = 'final.html';
+        }
+
+        function initGame() {
+            if (!checkAccess()) return;
+
+            generateCode();
+            attemptsRemaining = MAX_ATTEMPTS;
+            gameActive = true;
+
+            historyLog.innerHTML = '';
+            guessInput.value = '';
+            guessesLeftDisplay.innerText = MAX_ATTEMPTS;
+            document.getElementById('feedback-message').innerHTML = "Guess the secret 4-digit code (0-9). Digits do not repeat.<br><strong style='color: #2d6a4f;'>Hits:</strong> Correct digit & position · <strong style='color: #c68a2c;'>Clues:</strong> Correct digit, wrong position.";
+            resultOverlay.classList.remove('show');
+            submitButton.disabled = false;
+            guessInput.disabled = false;
+
+            gameCard.classList.remove('flash');
+            guessInput.focus();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            injectQuestHUD(5);
+            injectFloatingLilies(6);
+            initGame();
+
+            document.getElementById('directUnlockCyberBtn')?.addEventListener('click', () => {
+                QuestState.setWordGameDone();
+                QuestAudio.playSuccess();
+                document.getElementById('lockedModal').classList.remove('show');
+                initGame();
+                showToast('🔓 Cyber Quest Unlocked!');
+            });
+
+            guessInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    submitGuess();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

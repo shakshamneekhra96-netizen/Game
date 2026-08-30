@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Birthday Picture Puzzle</title>
+
+    <style>
+        :root {
+            --bg: #090d19;
+            --panel: rgba(255, 255, 255, .075);
+            --border: rgba(255, 255, 255, .14);
+            --text: #fff;
+            --muted: #aeb7ca;
+            --accent: #ff5fa2;
+            --accent2: #765cff;
+            --good: #48dfa2;
+            --gold: #ffd76a;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background: var(--bg);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100%;
+            padding: max(14px, env(safe-area-inset-top)) 12px max(28px, env(safe-area-inset-bottom));
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 12% 4%, rgba(255, 95, 162, .18), transparent 28%),
+                radial-gradient(circle at 88% 16%, rgba(118, 92, 255, .18), transparent 28%),
+                var(--bg);
+            overscroll-behavior-x: none;
+        }
+
+        .app {
+            width: min(100%, 980px);
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 8px 8px 15px;
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: clamp(27px, 7vw, 42px);
+            line-height: 1.04;
+        }
+
+        .subtitle {
+            margin: 0 auto;
+            max-width: 600px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        .main-panel,
+        .preview-panel,
+        .pieces-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            backdrop-filter: blur(16px);
+        }
+
+        .main-panel {
+            padding: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0 0 10px;
+        }
+
+        button {
+            min-height: 44px;
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 15px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid var(--border);
+        }
+
+        button:active {
+            transform: scale(.97);
+        }
+
+        .stats {
+            display: flex;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .stat {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 5px;
+            text-align: center;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, .17);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 17px;
+        }
+
+        .stat span {
+            display: block;
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .board-wrap {
+            background: rgba(0, 0, 0, .23);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 16px;
+            padding: 7px;
+        }
+
+        /*
+    EXACT PUZZLE:
+    5 rows x 4 columns = 20 pieces.
+  */
+        #board {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 2px;
+            overflow: hidden;
+            border-radius: 11px;
+            background: #060812;
+        }
+
+        .slot {
+            position: relative;
+            min-width: 0;
+            min-height: 0;
+            border: 1px dashed rgba(255, 255, 255, .13);
+            background: rgba(255, 255, 255, .025);
+            transition: background .15s, border-color .15s, box-shadow .15s;
+        }
+
+        .slot.over {
+            border-color: var(--accent);
+            background: rgba(255, 95, 162, .18);
+            box-shadow: inset 0 0 0 2px rgba(255, 95, 162, .35);
+        }
+
+        .slot.correct {
+            border: 1px solid rgba(72, 223, 162, .8);
+        }
+
+        .slot.hint-target {
+            border-color: var(--gold);
+            box-shadow: inset 0 0 0 3px rgba(255, 215, 106, .6);
+            animation: pulse .7s ease-in-out 4;
+        }
+
+        .slot img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .pieces-panel {
+            margin-top: 14px;
+            padding: 12px;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 9px;
+        }
+
+        .section-head strong {
+            font-size: 14px;
+        }
+
+        .section-head span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        #pieces {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 7px;
+        }
+
+        .piece {
+            position: relative;
+            min-width: 0;
+            aspect-ratio: 1 / 1.25;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, .15);
+            border-radius: 8px;
+            background: #11162a;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: transform .12s, border-color .12s, opacity .12s;
+        }
+
+        .piece img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .piece.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 106, .2);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .piece.hint-piece {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(255, 215, 106, .3);
+            animation: pulse .7s ease-in-out 4;
+        }
+
+        .piece.placed {
+            opacity: .25;
+            filter: grayscale(.25);
+            pointer-events: none;
+        }
+
+        .piece-num {
+            position: absolute;
+            right: 3px;
+            bottom: 3px;
+            padding: 2px 4px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, .68);
+            font-size: 8px;
+            font-weight: 850;
+        }
+
+        .preview-panel {
+            padding: 12px;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 9px;
+        }
+
+        .preview-title strong {
+            font-size: 14px;
+        }
+
+        .preview-title span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .preview-frame {
+            overflow: hidden;
+            border-radius: 15px;
+            background: #05070d;
+            border: 1px solid rgba(255, 255, 255, .12);
+        }
+
+        .preview-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            max-height: 620px;
+        }
+
+        .preview-note {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+            margin: 8px 2px 0;
+        }
+
+        .instructions {
+            padding: 11px 6px 2px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .message {
+            display: none;
+            margin-top: 13px;
+            padding: 17px;
+            border: 1px solid rgba(72, 223, 162, .35);
+            border-radius: 18px;
+            text-align: center;
+            background: rgba(72, 223, 162, .1);
+        }
+
+        .message.show {
+            display: block;
+            animation: pop .4s ease;
+        }
+
+        .message h2 {
+            margin: 0 0 4px;
+            font-size: 24px;
+        }
+
+        .message p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: max(18px, env(safe-area-inset-bottom));
+            z-index: 9999;
+            width: min(92vw, 430px);
+            padding: 12px 15px;
+            border-radius: 14px;
+            background: rgba(18, 22, 38, .96);
+            border: 1px solid rgba(255, 255, 255, .16);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
+            text-align: center;
+            font-size: 12px;
+            transform: translate(-50%, 140px);
+            transition: transform .22s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translate(-50%, 0);
+        }
+
+        /*
+    The floating piece follows the finger/mouse.
+    The page itself remains scrollable.
+  */
+        .drag-ghost {
+            position: fixed;
+            z-index: 10000;
+            width: 86px;
+            aspect-ratio: 1 / 1.25;
+            overflow: hidden;
+            border: 2px solid #fff;
+            border-radius: 9px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, .5);
+            pointer-events: none;
+            transform: translate(-50%, -50%) rotate(2deg) scale(1.06);
+        }
+
+        .drag-ghost img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .scroll-zone {
+            position: fixed;
+            z-index: 9990;
+            left: 0;
+            right: 0;
+            height: 82px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .scroll-zone.top {
+            top: 0;
+        }
+
+        .scroll-zone.bottom {
+            bottom: 0;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(.94);
+            }
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (min-width:760px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr) 290px;
+            }
+
+            .preview-panel {
+                position: sticky;
+                top: 14px;
+            }
+
+            #pieces {
+                grid-template-columns: repeat(10, 1fr);
+            }
+
+            .pieces-panel {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width:759px) {
+            .preview-panel {
+                order: 3;
+            }
+
+            .pieces-panel {
+                order: 2;
+            }
+
+            .main-panel {
+                order: 1;
+            }
+        }
+
+        @media (max-width:420px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .main-panel,
+            .preview-panel,
+            .pieces-panel {
+                border-radius: 18px;
+            }
+
+            #pieces {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+
+            .piece {
+                border-radius: 7px;
+            }
+
+            .drag-ghost {
+                width: 74px;
+            }
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <header>
+            <h1>Solve the Beautiful Background Puzzle</h1>
+            <p class="subtitle" style="font-size: 14.5px; margin-bottom: 6px;">
+                Did you remember that you once told me you wanted to solve 1,000 puzzles?
+                But because of your time constraints, I made a smaller one for you. 😏
+            </p>
+            <p
+                style="color: var(--text-dim, #6b7a99); font-size: 12px; margin: 2px auto 0; max-width: 560px; font-style: italic; opacity: 0.65; line-height: 1.5;">
+                — and yes, you have that pretty picture sitting there, supposedly hiding from the world. If I were you, I’d definitely use it as my profile picture. Just saying. 🙃
+            </p>
+        </header>
+
+        <div class="layout">
+
+            <section class="main-panel">
+                <div class="controls">
+                    <button id="hintBtn" type="button">💡 Hint</button>
+                    <button id="shuffleBtn" class="secondary" type="button">🔀 Shuffle</button>
+                    <button id="resetBtn" class="secondary" type="button">↻ Reset</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <strong id="placedCount">0</strong>
+                        <span>Placed</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="totalCount">20</strong>
+                        <span>Total</span>
+                    </div>
+                    <div class="stat">
+                        <strong id="hintCount">0</strong>
+                        <span>Hints</span>
+                    </div>
+                </div>
+
+                <div class="board-wrap">
+                    <div id="board" aria-label="5 row by 4 column puzzle board"></div>
+                </div>
+
+                <div class="instructions">
+                    <b>How to play:</b> press a piece → drag it → release it over the correct square.
+                    When your finger reaches the top/bottom edge, the page automatically scrolls.
+                </div>
+
+                <div id="completeMessage" class="message">
+                    <div
+                        style="font-size: 11px; font-weight: 800; color: #48dfa2; letter-spacing: 1.5px; text-transform: uppercase;">
+                        🎉 PUZZLE #01 SOLVED</div>
+                    <h2 style="margin: 6px 0 10px;">Remember this image carefully. 🧠</h2>
+                    <p style="font-size: 13px; color: #aeb7ca; margin-bottom: 15px;">You might need it later in your
+                        quest.</p>
+                    <button id="iRememberBtn" type="button"
+                        style="font-size: 14px; padding: 12px 24px; border-radius: 999px; background: linear-gradient(135deg, #765cff, #ff5fa2); border: 0; color: #fff; font-weight: 800; cursor: pointer;">
+                        I Remember 🧠 ➔
+                    </button>
+                </div>
+            </section>
+
+            <aside class="preview-panel">
+                <div class="preview-title">
+                    <strong>🖼️ Full Image</strong>
+                    <span>Reference preview</span>
+                </div>
+                <div class="preview-frame">
+                    <img src="miss_chand.png" alt="Full image preview for the puzzle">
+                </div>
+                <div class="preview-note">
+                    Keep this preview open while solving. On mobile it appears below the puzzle.
+                </div>
+                <div style="margin-top: 10px; padding: 10px 12px; background: rgba(255,107,157,0.08); border: 1px solid rgba(255,179,203,0.22); border-radius: 10px;">
+                    <p style="color: #ffd166; font-size: 12.5px; font-style: italic; margin: 0; line-height: 1.55;">
+                        “I don’t know if someone has told you this, but that is genuinely one of the cutest and prettiest pictures you have (a little aesthetic, but really sweet).” 🌸
+                    </p>
+                </div>
+            </aside>
+
+            <section class="pieces-panel">
+                <div class="section-head">
+                    <strong>🧩 Puzzle Pieces</strong>
+                    <span>5 rows × 4 columns</span>
+                </div>
+                <div id="pieces"></div>
+            </section>
+
+        </div>
+    </div>
+
+    <div class="scroll-zone top" id="topScrollZone"></div>
+    <div class="scroll-zone bottom" id="bottomScrollZone"></div>
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script>
+        /*
+          ============================================================
+          PUZZLE FILE SETUP
+          ============================================================
+        
+          Keep this HTML in the SAME folder as:
+        
+            miss_chand.png
+        
+            miss_chand_r1_c1.png
+            miss_chand_r1_c2.png
+            miss_chand_r1_c3.png
+            miss_chand_r1_c4.png
+        
+            miss_chand_r2_c1.png ... miss_chand_r2_c4.png
+            miss_chand_r3_c1.png ... miss_chand_r3_c4.png
+            miss_chand_r4_c1.png ... miss_chand_r4_c4.png
+            miss_chand_r5_c1.png ... miss_chand_r5_c4.png
+        
+          Total: 5 rows × 4 columns = 20 pieces.
+        */
+
+        const ROWS = 5;
+        const COLS = 4;
+        const IMAGE_PREFIX = "miss_chand_";
+        const IMAGE_EXT = ".png";
+
+        const board = document.getElementById("board");
+        const piecesBox = document.getElementById("pieces");
+        const placedCountEl = document.getElementById("placedCount");
+        const totalCountEl = document.getElementById("totalCount");
+        const hintCountEl = document.getElementById("hintCount");
+        const completeMessage = document.getElementById("completeMessage");
+        const toast = document.getElementById("toast");
+
+        let pieces = [];
+        let placed = new Set();
+        let hintCount = 0;
+        let activeDrag = null;
+        let toastTimer = null;
+        let autoScrollFrame = null;
+        let latestPointer = { x: 0, y: 0 };
+
+        function imageName(row, col) {
+            return `${IMAGE_PREFIX}r${row}_c${col}${IMAGE_EXT}`;
+        }
+
+        function makePiece(row, col) {
+            return {
+                id: `r${row}c${col}`,
+                row,
+                col,
+                src: imageName(row, col)
+            };
+        }
+
+        function buildPuzzle() {
+            stopAutoScroll();
+            board.innerHTML = "";
+            piecesBox.innerHTML = "";
+            placed.clear();
+            completeMessage.classList.remove("show");
+            hintCount = 0;
+            pieces = [];
+
+            for (let row = 1; row <= ROWS; row++) {
+                for (let col = 1; col <= COLS; col++) {
+                    const piece = makePiece(row, col);
+                    pieces.push(piece);
+
+                    const slot = document.createElement("div");
+                    slot.className = "slot";
+                    slot.dataset.id = piece.id;
+                    slot.dataset.row = row;
+                    slot.dataset.col = col;
+                    board.appendChild(slot);
+                }
+            }
+
+            shuffleArray(pieces);
+            renderPieces();
+            updateStats();
+        }
+
+        function renderPieces() {
+            piecesBox.innerHTML = "";
+
+            pieces.forEach(piece => {
+                const el = document.createElement("div");
+                el.className = "piece";
+                el.dataset.id = piece.id;
+                el.dataset.row = piece.row;
+                el.dataset.col = piece.col;
+                el.setAttribute("role", "button");
+                el.setAttribute("aria-label", `Puzzle piece row ${piece.row}, column ${piece.col}`);
+
+                const img = document.createElement("img");
+                img.src = piece.src;
+                img.alt = "";
+                img.draggable = false;
+
+                const num = document.createElement("div");
+                num.className = "piece-num";
+                num.textContent = `${piece.row},${piece.col}`;
+
+                el.append(img, num);
+                piecesBox.appendChild(el);
+
+                el.addEventListener("pointerdown", startDrag, { passive: false });
+            });
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function getPiece(id) {
+            return pieces.find(piece => piece.id === id);
+        }
+
+        function updateStats() {
+            placedCountEl.textContent = placed.size;
+            totalCountEl.textContent = ROWS * COLS;
+            hintCountEl.textContent = hintCount;
+        }
+
+        function getSlotAt(x, y) {
+            const elements = document.elementsFromPoint(x, y);
+            return elements.find(el => el.classList && el.classList.contains("slot"));
+        }
+
+        /* ------------------------------------------------------------
+           DRAGGING
+           ------------------------------------------------------------ */
+
+        function startDrag(event) {
+            if (event.pointerType === "mouse" && event.button !== 0) return;
+
+            const pieceEl = event.currentTarget;
+            const id = pieceEl.dataset.id;
+
+            if (placed.has(id)) return;
+
+            event.preventDefault();
+
+            latestPointer.x = event.clientX;
+            latestPointer.y = event.clientY;
+
+            activeDrag = {
+                id,
+                pieceEl,
+                pointerId: event.pointerId,
+                ghost: null
+            };
+
+            pieceEl.classList.add("selected");
+
+            try {
+                pieceEl.setPointerCapture(event.pointerId);
+            } catch (_) { }
+
+            createGhost(pieceEl, event.clientX, event.clientY);
+            startAutoScroll();
+
+            window.addEventListener("pointermove", moveDrag, { passive: false });
+            window.addEventListener("pointerup", endDrag, { passive: false });
+            window.addEventListener("pointercancel", cancelDrag, { passive: false });
+        }
+
+        function createGhost(pieceEl, x, y) {
+            const ghost = document.createElement("div");
+            ghost.className = "drag-ghost";
+
+            const img = document.createElement("img");
+            img.src = pieceEl.querySelector("img").src;
+            img.alt = "";
+
+            ghost.appendChild(img);
+            ghost.style.left = `${x}px`;
+            ghost.style.top = `${y}px`;
+
+            document.body.appendChild(ghost);
+            activeDrag.ghost = ghost;
+        }
+
+        function moveDrag(event) {
+            if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+
+            event.preventDefault();
+
+            latestPointer.x = event.clientX;
+            latestPointer.y = event.clientY;
+
+            if (activeDrag.ghost) {
+                activeDrag.ghost.style.left = `${event.clientX}px`;
+                activeDrag.ghost.style.top = `${event.clientY}px`;
+            }
+
+            highlightDropTarget(event.clientX, event.clientY);
+        }
+
+        function highlightDropTarget(x, y) {
+            document.querySelectorAll(".slot.over").forEach(slot => slot.classList.remove("over"));
+
+            const slot = getSlotAt(x, y);
+
+            if (slot && !slot.querySelector("img")) {
+                slot.classList.add("over");
+            }
+        }
+
+        function endDrag(event) {
+            if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+
+            event.preventDefault();
+
+            latestPointer.x = event.clientX;
+            latestPointer.y = event.clientY;
+
+            const drag = activeDrag;
+            const slot = getSlotAt(event.clientX, event.clientY);
+
+            cleanupDrag();
+
+            if (!slot) {
+                showToast("Drop the piece on the puzzle board.");
+                return;
+            }
+
+            const piece = getPiece(drag.id);
+
+            if (!piece) return;
+
+            if (slot.dataset.id === piece.id && !slot.querySelector("img")) {
+                placePiece(piece, slot);
+            } else {
+                slot.classList.add("over");
+                setTimeout(() => slot.classList.remove("over"), 260);
+                showToast("Not quite! Try another square 🕵️");
+            }
+        }
+
+        function cancelDrag() {
+            cleanupDrag();
+        }
+
+        function cleanupDrag() {
+            if (!activeDrag) return;
+
+            activeDrag.pieceEl.classList.remove("selected");
+
+            if (activeDrag.ghost) {
+                activeDrag.ghost.remove();
+            }
+
+            document.querySelectorAll(".slot.over").forEach(slot => slot.classList.remove("over"));
+
+            stopAutoScroll();
+
+            window.removeEventListener("pointermove", moveDrag);
+            window.removeEventListener("pointerup", endDrag);
+            window.removeEventListener("pointercancel", cancelDrag);
+
+            activeDrag = null;
+        }
+
+        /* ------------------------------------------------------------
+           AUTOMATIC PAGE SCROLL WHILE DRAGGING
+           ------------------------------------------------------------
+        
+           If the finger/mouse gets near the top or bottom edge,
+           window.scrollBy() continuously moves the page.
+        
+           This is especially useful on iPhone because the pieces
+           can be far below the board after scrolling.
+        */
+
+        function startAutoScroll() {
+            if (autoScrollFrame) return;
+
+            const tick = () => {
+                if (!activeDrag) {
+                    autoScrollFrame = null;
+                    return;
+                }
+
+                const y = latestPointer.y;
+                const height = window.innerHeight;
+
+                const edge = 105;
+                let amount = 0;
+
+                if (y < edge) {
+                    const intensity = Math.max(0, edge - y) / edge;
+                    amount = -Math.max(2.5, 16 * intensity);
+                } else if (y > height - edge) {
+                    const intensity = Math.max(0, y - (height - edge)) / edge;
+                    amount = Math.max(2.5, 16 * intensity);
+                }
+
+                if (amount !== 0) {
+                    window.scrollBy(0, amount);
+
+                    // The finger stays in the same viewport position while the
+                    // document moves, so re-check the board underneath it.
+                    highlightDropTarget(latestPointer.x, latestPointer.y);
+                }
+
+                autoScrollFrame = requestAnimationFrame(tick);
+            };
+
+            autoScrollFrame = requestAnimationFrame(tick);
+        }
+
+        function stopAutoScroll() {
+            if (autoScrollFrame) {
+                cancelAnimationFrame(autoScrollFrame);
+                autoScrollFrame = null;
+            }
+        }
+
+        /* ------------------------------------------------------------
+           PLACING PIECES
+           ------------------------------------------------------------ */
+
+        function placePiece(piece, slot) {
+            const img = document.createElement("img");
+            img.src = piece.src;
+            img.alt = "";
+            img.draggable = false;
+
+            slot.appendChild(img);
+            slot.classList.add("correct");
+
+            placed.add(piece.id);
+
+            const pieceEl = document.querySelector(`.piece[data-id="${piece.id}"]`);
+            if (pieceEl) pieceEl.classList.add("placed");
+
+            updateStats();
+
+            if (placed.size === ROWS * COLS) {
+                completeMessage.classList.add("show");
+
+                setTimeout(() => {
+                    completeMessage.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }, 180);
+            }
+        }
+
+        /* ------------------------------------------------------------
+           HINT
+           ------------------------------------------------------------ */
+
+        function showHint() {
+            if (placed.size === ROWS * COLS) {
+                showToast("The puzzle is already complete! 🎉");
+                return;
+            }
+
+            const piece = pieces.find(item => !placed.has(item.id));
+            if (!piece) return;
+
+            hintCount++;
+            updateStats();
+
+            document.querySelectorAll(".hint-piece,.hint-target")
+                .forEach(el => el.classList.remove("hint-piece", "hint-target"));
+
+            const pieceEl = document.querySelector(`.piece[data-id="${piece.id}"]`);
+            const slot = document.querySelector(`.slot[data-id="${piece.id}"]`);
+
+            pieceEl?.classList.add("hint-piece");
+            slot?.classList.add("hint-target");
+
+            showToast(`Hint: ${piece.row},${piece.col} → row ${piece.row}, column ${piece.col}`);
+
+            setTimeout(() => {
+                pieceEl?.classList.remove("hint-piece");
+                slot?.classList.remove("hint-target");
+            }, 3200);
+        }
+
+        /* ------------------------------------------------------------
+           SHUFFLE / RESET
+           ------------------------------------------------------------ */
+
+        function shuffleRemaining() {
+            const remaining = pieces.filter(piece => !placed.has(piece.id));
+            shuffleArray(remaining);
+
+            let index = 0;
+
+            pieces = pieces.map(piece => {
+                if (placed.has(piece.id)) return piece;
+                return remaining[index++];
+            });
+
+            renderPieces();
+
+            pieces.forEach(piece => {
+                if (placed.has(piece.id)) {
+                    document.querySelector(`.piece[data-id="${piece.id}"]`)?.classList.add("placed");
+                }
+            });
+
+            showToast("Remaining pieces shuffled 🔀");
+        }
+
+        function resetPuzzle() {
+            if (!window.confirm("Reset the whole puzzle?")) return;
+
+            buildPuzzle();
+            showToast("Puzzle reset. Good luck! 🧩");
+        }
+
+        /* ------------------------------------------------------------
+           TOAST
+           ------------------------------------------------------------ */
+
+        function showToast(message) {
+            clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.classList.add("show");
+
+            toastTimer = setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2400);
+        }
+
+        /* Prevent native browser image dragging/context menu on pieces. */
+        document.addEventListener("dragstart", event => event.preventDefault());
+
+        document.addEventListener("contextmenu", event => {
+            if (event.target.closest(".piece,.slot")) {
+                event.preventDefault();
+            }
+        });
+
+        document.getElementById("hintBtn").addEventListener("click", showHint);
+        document.getElementById("shuffleBtn").addEventListener("click", shuffleRemaining);
+        document.getElementById("resetBtn").addEventListener("click", resetPuzzle);
+        document.getElementById("iRememberBtn")?.addEventListener("click", () => {
+            try {
+                const key = 'birthday_cipher_quest_v1';
+                const data = localStorage.getItem(key);
+                const state = data ? JSON.parse(data) : {};
+                state.imagePuzzleDone = true;
+                localStorage.setItem(key, JSON.stringify(state));
+            } catch (_) { }
+            window.location.href = "../hub.html";
+        });
+
+        buildPuzzle();
+    </script>
+</body>
+
+</html>

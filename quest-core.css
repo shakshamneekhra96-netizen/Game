@@ -1,0 +1,422 @@
+/* =========================================================
+   FOR ANJALI CHANDWANI - VINTAGE PARCHMENT BIRTHDAY QUEST
+   Natural Antique Paper & Warm Nostalgic Aesthetic
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Outfit:wght@500;600;700;800&display=swap');
+
+:root {
+    /* Warm Natural Parchment Palette */
+    --bg-paper: #f5ecd8;
+    --text-main: #2d1b0f;
+    --text-muted: #5c3e28;
+    --text-dim: #8c684d;
+
+    --accent-crimson: #8b263e;
+    --accent-rose: #b54a65;
+    --accent-gold: #c68a2c;
+    --accent-amber: #d99026;
+    --accent-wood: #4a2c17;
+    --accent-mint: #2d6a4f;
+
+    --border-gold: rgba(198, 138, 44, 0.45);
+    --border-subtle: rgba(92, 62, 40, 0.2);
+
+    /* Card Backgrounds */
+    --card-bg: rgba(255, 250, 240, 0.92);
+    --card-bg-warm: rgba(252, 246, 235, 0.96);
+    
+    /* Typography - Simple, Clean & Beautiful */
+    --font-royal: 'Playfair Display', Georgia, serif;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-cursive: 'Playfair Display', Georgia, serif;
+    --font-handwriting: 'Outfit', 'Inter', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-pill: 9999px;
+
+    --shadow-soft: 0 10px 30px rgba(74, 44, 23, 0.12), 0 2px 6px rgba(74, 44, 23, 0.06);
+    --shadow-hover: 0 15px 40px rgba(74, 44, 23, 0.2), 0 0 15px rgba(198, 138, 44, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    min-height: 100%;
+    background-color: var(--bg-paper);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Universal Natural Parchment Background */
+.quest-ambient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    background: url('background.png') center/cover no-repeat fixed;
+}
+
+/* Typography Helpers */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: #2b180d;
+    letter-spacing: 0.01em;
+}
+
+.vintage-cursive {
+    font-family: var(--font-heading);
+    font-style: italic;
+    color: var(--accent-crimson);
+    line-height: 1.35;
+}
+
+.vintage-handwriting {
+    font-family: var(--font-handwriting);
+    line-height: 1.4;
+}
+
+.vintage-title {
+    font-family: var(--font-heading);
+    color: #2b180d;
+}
+
+.eyebrow {
+    font-family: var(--font-handwriting);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-crimson);
+    margin-bottom: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Parchment Cards */
+.glass-card, .parchment-card {
+    background: var(--card-bg-warm);
+    color: var(--text-main);
+    border: 2px solid rgba(198, 138, 44, 0.4);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), transparent 50%, rgba(198, 138, 44, 0.3));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* HUD */
+.quest-hud {
+    width: min(100%, 960px);
+    margin: 0 auto 1.4rem auto;
+    padding: 0.75rem 1.4rem;
+    background: rgba(255, 248, 235, 0.92);
+    border: 2px solid rgba(198, 138, 44, 0.5);
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    position: sticky;
+    top: 12px;
+    z-index: 900;
+    box-shadow: 0 8px 30px rgba(74, 44, 23, 0.15);
+}
+
+.quest-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-cursive);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #8b263e;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.quest-steps {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.quest-step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(92, 62, 40, 0.08);
+    border: 1px solid rgba(198, 138, 44, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.quest-step-dot.active {
+    background: linear-gradient(135deg, #8b263e, #c68a2c);
+    color: #fff;
+    border-color: #ffd166;
+    box-shadow: 0 0 14px rgba(198, 138, 44, 0.6);
+    transform: scale(1.12);
+}
+
+.quest-step-dot.completed {
+    background: rgba(45, 106, 79, 0.18);
+    border-color: rgba(45, 106, 79, 0.6);
+    color: #2d6a4f;
+    font-weight: 800;
+}
+
+.quest-step-line {
+    width: 14px;
+    height: 2px;
+    background: rgba(92, 62, 40, 0.2);
+}
+
+.quest-step-line.filled {
+    background: #c68a2c;
+}
+
+.hud-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn-quest {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    padding: 0.8rem 1.8rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #ffffff;
+    background: linear-gradient(135deg, #8b263e 0%, #631729 100%);
+    box-shadow: 0 6px 20px rgba(139, 38, 62, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    user-select: none;
+}
+
+.btn-quest:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 38, 62, 0.5);
+    filter: brightness(1.06);
+}
+
+.btn-quest:active {
+    transform: translateY(1px);
+}
+
+.btn-quest-gold {
+    background: linear-gradient(135deg, #d49a37 0%, #a66f1b 100%);
+    color: #2b180d;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(166, 111, 27, 0.35);
+}
+
+.btn-quest-gold:hover {
+    box-shadow: 0 10px 25px rgba(166, 111, 27, 0.55);
+}
+
+.btn-quest-pink {
+    background: linear-gradient(135deg, #b54a65 0%, #83273e 100%);
+    box-shadow: 0 6px 20px rgba(181, 74, 101, 0.35);
+}
+
+.btn-quest-secondary {
+    background: rgba(255, 248, 235, 0.9);
+    border: 2px solid rgba(198, 138, 44, 0.4);
+    color: #4a2c17;
+    box-shadow: 0 4px 15px rgba(74, 44, 23, 0.1);
+}
+
+.btn-quest-secondary:hover {
+    background: #ffffff;
+    border-color: rgba(198, 138, 44, 0.8);
+    color: #2b180d;
+}
+
+.btn-sm {
+    padding: 0.45rem 0.95rem;
+    font-size: 0.85rem;
+}
+
+.btn-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    padding: 0;
+}
+
+/* Modals */
+.quest-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(43, 24, 13, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.quest-modal-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.quest-modal {
+    width: min(100%, 500px);
+    background: var(--card-bg-warm);
+    border: 2px solid rgba(198, 138, 44, 0.6);
+    border-radius: var(--radius-lg);
+    padding: 2.2rem;
+    text-align: center;
+    box-shadow: 0 25px 70px rgba(43, 24, 13, 0.4);
+    transform: scale(0.92) translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text-main);
+}
+
+.quest-modal-backdrop.show .quest-modal {
+    transform: scale(1) translateY(0);
+}
+
+/* Toast */
+.quest-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(255, 248, 235, 0.98);
+    border: 2px solid rgba(198, 138, 44, 0.6);
+    border-radius: var(--radius-pill);
+    padding: 0.8rem 1.6rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2b180d;
+    box-shadow: 0 12px 35px rgba(74, 44, 23, 0.25);
+    backdrop-filter: blur(16px);
+    z-index: 3000;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    max-width: 90vw;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.quest-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Confetti Canvas */
+#questConfettiCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 5000;
+}
+
+/* Floating Lilies */
+.floating-lilies-stage {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.floating-lily {
+    position: absolute;
+    bottom: -80px;
+    width: 38px;
+    height: 38px;
+    opacity: 0;
+    animation: lilyFloatUp var(--duration, 10s) ease-in var(--delay, 0s) infinite;
+}
+
+@keyframes lilyFloatUp {
+    0% { transform: translateY(0) rotate(0deg) scale(0.6); opacity: 0; }
+    15% { opacity: 0.6; }
+    85% { opacity: 0.6; }
+    100% { transform: translateY(-115vh) rotate(360deg) scale(1.05); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .quest-hud {
+        padding: 0.65rem 0.9rem;
+        top: 8px;
+    }
+
+    .quest-steps {
+        gap: 0.3rem;
+    }
+
+    .quest-step-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 0.78rem;
+    }
+
+    .quest-step-line {
+        width: 8px;
+    }
+
+    .quest-brand span {
+        display: none;
+    }
+}

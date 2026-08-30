@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Birthday Quest for Anjali Chandwani</title>
+    <link rel="stylesheet" href="quest-core.css">
+    <style>
+        .hub-container {
+            width: min(100%, 920px);
+            margin: 0 auto;
+            padding: 1.5rem 1.2rem 4.5rem 1.2rem;
+        }
+
+        .hub-header {
+            text-align: center;
+            margin: 1rem auto 2.5rem auto;
+            max-width: 680px;
+        }
+
+        .hub-title {
+            font-size: clamp(2.2rem, 6vw, 3.2rem);
+            margin: 0.3rem 0 0.5rem 0;
+            line-height: 1.15;
+            color: #2b180d;
+        }
+
+        .hub-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* ---------------------------------------------------------
+           PERSONAL NOTE FLOATING WAX SEAL & MODAL
+           --------------------------------------------------------- */
+        .personal-note-trigger {
+            position: fixed;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            padding: 0.85rem 1.2rem;
+            border: 2px solid rgba(198, 138, 44, 0.6);
+            border-radius: var(--radius-pill);
+            background: rgba(255, 248, 235, 0.96);
+            color: #8b263e;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(74, 44, 23, 0.2), 0 0 15px rgba(198, 138, 44, 0.2);
+            cursor: pointer;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .personal-note-trigger:hover {
+            transform: translateY(-50%) scale(1.06);
+            box-shadow: 0 14px 40px rgba(74, 44, 23, 0.35);
+        }
+
+        .personal-note-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+            background: rgba(43, 24, 13, 0.65);
+            backdrop-filter: blur(8px);
+        }
+
+        .personal-note-modal.show {
+            display: flex;
+        }
+
+        .personal-note-box {
+            width: min(100%, 760px);
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 0;
+            border: 2px solid rgba(198, 138, 44, 0.6);
+            border-radius: var(--radius-lg);
+            background: url('background.png') center/cover no-repeat;
+            box-shadow: 0 25px 70px rgba(43, 24, 13, 0.45);
+            position: relative;
+            text-align: left;
+        }
+
+        .note-letter-inner {
+            background: rgba(255, 250, 240, 0.9);
+            border-radius: calc(var(--radius-lg) - 2px);
+            padding: 2.4rem 2.2rem 2rem 2.2rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .note-letter-inner p {
+            font-size: 1.15rem;
+            color: #2b180d;
+            line-height: 1.9;
+            margin-bottom: 1.2rem;
+            font-family: var(--font-body);
+        }
+
+        .personal-note-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(198, 138, 44, 0.4);
+            border-radius: 50%;
+            background: rgba(255, 248, 235, 0.95);
+            color: #8b263e;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+
+        .personal-note-close:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .personal-note-trigger {
+                right: 12px;
+                top: auto;
+                bottom: 18px;
+                transform: none;
+            }
+
+            .personal-note-trigger:hover {
+                transform: scale(1.04);
+            }
+
+            .personal-note-box {
+                padding: 1rem;
+                max-height: 90vh;
+            }
+        }
+
+        /* ---------------------------------------------------------
+           2 CHALLENGE CARDS GRID
+           --------------------------------------------------------- */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .challenge-card {
+            padding: 2.4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            min-height: 380px;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(139, 38, 62, 0.5);
+            box-shadow: 0 20px 45px rgba(74, 44, 23, 0.25);
+        }
+
+        .challenge-card.locked-card {
+            filter: grayscale(0.7) opacity(0.75);
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+
+        .challenge-card.locked-card:hover {
+            transform: none;
+            box-shadow: var(--shadow-soft);
+            border-color: rgba(198, 138, 44, 0.3);
+        }
+
+        .card-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-pill);
+            background: rgba(92, 62, 40, 0.08);
+            font-family: var(--font-heading);
+        }
+
+        .status-badge.unlocked {
+            background: rgba(198, 138, 44, 0.15);
+            color: #8b263e;
+            border: 1px solid rgba(198, 138, 44, 0.5);
+        }
+
+        .status-badge.completed {
+            background: rgba(45, 106, 79, 0.18);
+            color: #2d6a4f;
+            border: 1px solid rgba(45, 106, 79, 0.5);
+        }
+
+        .status-badge.locked {
+            background: rgba(139, 38, 62, 0.1);
+            color: #8b263e;
+            border: 1px solid rgba(139, 38, 62, 0.3);
+        }
+
+        .challenge-icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            background: rgba(198, 138, 44, 0.12);
+            border: 1px solid rgba(198, 138, 44, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 15px rgba(74, 44, 23, 0.1);
+        }
+
+        .challenge-name {
+            font-size: 1.7rem;
+            margin-bottom: 0.6rem;
+            font-family: var(--font-heading);
+            color: #2b180d;
+        }
+
+        .challenge-desc {
+            color: var(--text-muted);
+            font-size: 1.02rem;
+            line-height: 1.6;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Finale Ready Banner */
+        .finale-banner-card {
+            padding: 2.2rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 248, 235, 0.98), rgba(246, 232, 210, 0.95));
+            border: 2px solid #c68a2c;
+            border-radius: var(--radius-lg);
+            margin-top: 2rem;
+            box-shadow: 0 15px 40px rgba(74, 44, 23, 0.2);
+            display: none;
+        }
+
+        .finale-banner-card.show {
+            display: block;
+            animation: bounceIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes bounceIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quest-ambient-bg"></div>
+
+    <!-- Floating Note Trigger -->
+    <button class="personal-note-trigger" id="openPersonalNoteBtn" title="Read Note">
+        <span>📜</span> Note
+    </button>
+
+    <!-- Note Modal -->
+    <div class="personal-note-modal" id="personalNoteModal">
+        <div class="personal-note-box">
+            <button class="personal-note-close" id="closePersonalNoteBtn" aria-label="Close Note">&times;</button>
+            <div class="note-letter-inner">
+                <div class="eyebrow" style="text-align:center; margin-bottom: 1.2rem;">💌 For Anjali</div>
+
+                <p>I know you don't care much about these things, but some people genuinely worry about you. That's why
+                    they ask you what changed. They're not asking because they have nothing better to do or because they
+                    want to annoy you. If you genuinely care about someone, you would probably do the same, maybe even
+                    more than I do. And when someone genuinely asks you about something, it doesn't mean they expect you
+                    to tell them everything or explain every little thing.</p>
+
+                <p>And I know sometimes when someone asks you something, your first thought might be, "Why do you want
+                    to know? What are you going to do with that? Why do you need to know so much?" Or maybe even, "Sab
+                    bataun teko kya?" I know, sabko aap sab nahi bata sakti… I understand that. But for me, it's… leave
+                    it. There can be a lot of thoughts like that, and honestly, I think we're quite similar in that way.
+                    Even when my mom asks me something, mere mind mein bhi yehi thoughts aate hain.</p>
+
+                <p>But remember one thing: try to see the intention behind the question. Trust me, you won't feel as
+                    irritated when you understand that the person is asking because they genuinely care, not because
+                    they want to interfere, control you, or annoy you.</p>
+
+                <p>But when you suddenly change or become distant, people may worry. It's not about wanting to know
+                    everything you're doing. Sometimes, just telling a friend a little bit is enough to keep them from
+                    worrying. It doesn't matter if the reason sounds silly, and you don't have to make up an excuse
+                    either. Whether you were thinking about the mountains, needed a little break, or simply didn't feel
+                    like talking, saying something is better than leaving people wondering.</p>
+
+                <p>I'll tell you one secret. When you're thinking about something that's not part of your mountain plans
+                    or anything you've mentioned, sometimes it shows. Your hand gestures are different, your eyes say a
+                    lot, and even your tone has a slightly different feel to it. Your whole way of being changes a
+                    little.</p>
+
+                <p>But anyway, I believe in you. Maybe you're lying, maybe you're making an excuse, or maybe you
+                    genuinely have a reason. It's always in your hands to choose whether you tell the truth or lie. In
+                    the end, it's your choice whether you want to break someone's trust or protect it.</p>
+
+                <p>And honestly, I only trust what you tell me. Whatever is running through my mind, whatever I might be
+                    thinking, I still choose to believe what you say. So whether it's the truth, a small excuse, or
+                    something you simply don't want to share, it's up to you. I don't trust just anyone like that,
+                    especially not to this extent.</p>
+
+                <p>You don't have to explain everything. Sometimes, even a simple "I need some time" or "I'm not feeling
+                    great right now" is enough. At least then, the other person knows something is going on and doesn't
+                    have to assume the worst.</p>
+
+                <p>Anyway, try to trust people and remember the intention behind what they say. Sometimes people may say
+                    things in the wrong way, but that doesn't always mean they have a bad intention.</p>
+
+                <p>And I know I'm not always right either. Neither are you. We're both going to misunderstand things
+                    sometimes. Just remember that when someone genuinely cares about you, their concern usually comes
+                    from that care, not from wanting to control you or know everything about you.</p>
+
+                <p>So please understand what I'm trying to say. Use your <strong>2gm little brain</strong> for once. 😂
+                </p>
+
+                <div style="margin-top: 1.8rem; text-align: center;">
+                    <button class="btn-quest btn-quest-gold" id="modalCloseBtn" style="padding: 0.65rem 2.4rem;">
+                        Close ✕
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="hub-container">
+
+        <header class="hub-header">
+            <div class="eyebrow">🎁 For You, Little Surprise</div>
+            <h1 class="hub-title">Next Challenges</h1>
+            <p class="hub-subtitle">
+                You have to use your chotu sa brain to get this small surprise. 🧠😂
+            </p>
+        </header>
+
+        <!-- 2 BLOCKS SHOW UP -->
+        <div class="challenges-grid">
+
+            <!-- 1. THE WORD CHAIN -->
+            <article class="glass-card challenge-card" id="cardWordGame">
+                <div>
+                    <div class="card-header-top">
+                        <span class="status-badge unlocked" id="badgeWordGame">Chamber 01</span>
+                        <span class="doodle-text" style="font-size: 1.1rem; color: #8b263e;">9 Chains</span>
+                    </div>
+
+                    <div class="challenge-icon-box">✍️</div>
+                    <h2 class="challenge-name">The Word Chain</h2>
+                    <p class="challenge-desc">
+                        Follow the thread of linked words to uncover the hidden phrase and claim your master password
+                        key.
+                    </p>
+                </div>
+
+                <div>
+                    <a href="password.html" id="btnWordGame" class="btn-quest btn-quest-gold" style="width: 100%;">
+                        Enter Word Chain ➔
+                    </a>
+                </div>
+            </article>
+
+            <!-- 2. CODE BREAKER CRYPTEX -->
+            <article class="glass-card challenge-card" id="cardCyberQuest">
+                <div>
+                    <div class="card-header-top">
+                        <span class="status-badge locked" id="badgeCyberQuest">Chamber 02</span>
+                        <span class="doodle-text" style="font-size: 1.1rem; color: #8b263e;">4 Digits</span>
+                    </div>
+
+                    <div class="challenge-icon-box">🔐</div>
+                    <h2 class="challenge-name">Code Breaker Cryptex</h2>
+                    <p class="challenge-desc">
+                        Decrypt the secret 4-digit code using hits and position clues before attempts run out!
+                    </p>
+                </div>
+
+                <div>
+                    <a href="cyber.html" id="btnCyberQuest" class="btn-quest btn-quest-secondary" style="width: 100%;">
+                        Locked 🔒
+                    </a>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- FINALE UNLOCKED BANNER -->
+        <section class="finale-banner-card" id="finaleBanner">
+            <div class="eyebrow" style="font-size: 1.5rem;">🎉 ALL CHALLENGES CONQUERED!</div>
+            <h2 style="font-size: 2.2rem; color: #2b180d; margin: 0.3rem 0 0.6rem 0;">Your Birthday Finale is Ready</h2>
+            <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 580px; margin: 0 auto 1.5rem auto;">
+                Every code has been deciphered. Open your handwritten letter, voice note, and surprise gift!
+            </p>
+            <a href="final.html" class="btn-quest btn-quest-gold" style="font-size: 1.15rem; padding: 0.9rem 2.8rem;">
+                Open Birthday Finale ❤️ ➔
+            </a>
+        </section>
+
+        <!-- Bottom Actions -->
+        <!-- <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+            <button id="openPersonalNoteBottomBtn" class="btn-quest btn-quest-pink">
+                📜 Read Personal Note
+            </button>
+            <button id="hubResetBtn" class="btn-quest btn-quest-secondary">
+                ↻ Reset Progress
+            </button>
+        </div> -->
+
+    </main>
+
+    <script src="quest-core.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inject Top HUD (Step 3: Hub)
+            injectQuestHUD(3);
+            injectFloatingLilies(10);
+
+            const state = QuestState.get();
+
+            const cardWord = document.getElementById('cardWordGame');
+            const cardCyber = document.getElementById('cardCyberQuest');
+            const badgeWord = document.getElementById('badgeWordGame');
+            const badgeCyber = document.getElementById('badgeCyberQuest');
+            const btnWord = document.getElementById('btnWordGame');
+            const btnCyber = document.getElementById('btnCyberQuest');
+            const finaleBanner = document.getElementById('finaleBanner');
+
+            // Progression Logic:
+            // 1. Word Game status
+            if (state.wordGameDone) {
+                badgeWord.textContent = 'Completed ✓';
+                badgeWord.className = 'status-badge completed';
+                btnWord.textContent = 'Play Again ↻';
+                btnWord.className = 'btn-quest btn-quest-secondary';
+
+                // Unlock Cyber Quest
+                badgeCyber.textContent = 'Unlocked ✨';
+                badgeCyber.className = 'status-badge unlocked';
+                btnCyber.textContent = 'Enter Code Breaker ➔';
+                btnCyber.className = 'btn-quest btn-quest-gold';
+                btnCyber.href = 'cyber.html';
+                cardCyber.classList.remove('locked-card');
+            } else {
+                // Word Game is active, Cyber Quest is locked
+                badgeWord.textContent = 'Unlocked ✨';
+                badgeWord.className = 'status-badge unlocked';
+                badgeCyber.textContent = 'Locked 🔒';
+                badgeCyber.className = 'status-badge locked';
+                btnCyber.textContent = 'Complete Word Game First 🔒';
+                btnCyber.className = 'btn-quest btn-quest-secondary';
+                btnCyber.href = 'javascript:void(0)';
+                btnCyber.addEventListener('click', () => {
+                    QuestAudio.playTone(220, 'sawtooth', 0.15, 0.1);
+                    showToast('Complete The Word Chain first to unlock this chamber! ✍️');
+                });
+                cardCyber.classList.add('locked-card');
+            }
+
+            // 2. Cyber Quest status & Finale unlock
+            if (state.cyberQuestDone) {
+                badgeCyber.textContent = 'Completed ✓';
+                badgeCyber.className = 'status-badge completed';
+                finaleBanner.classList.add('show');
+            }
+
+            // Note Modal Logic
+            const modal = document.getElementById('personalNoteModal');
+            const openBtn = document.getElementById('openPersonalNoteBtn');
+            const openBottomBtn = document.getElementById('openPersonalNoteBottomBtn');
+            const closeBtn = document.getElementById('closePersonalNoteBtn');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            function openNote() {
+                modal.classList.add('show');
+                QuestAudio.playClick();
+            }
+
+            function closeNote() {
+                modal.classList.remove('show');
+                QuestAudio.playClick();
+            }
+
+            openBtn?.addEventListener('click', openNote);
+            openBottomBtn?.addEventListener('click', openNote);
+            closeBtn?.addEventListener('click', closeNote);
+            modalCloseBtn?.addEventListener('click', closeNote);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeNote();
+            });
+
+            document.getElementById('hubResetBtn')?.addEventListener('click', () => {
+                if (confirm('Restart the whole quest from the beginning?')) {
+                    QuestState.reset();
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

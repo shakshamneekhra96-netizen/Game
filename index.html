@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Birthday Quest for Anjali Chandwani</title>
+    <link rel="stylesheet" href="quest-core.css">
+    <style>
+        .page-container {
+            width: min(100%, 980px);
+            margin: 0 auto;
+            padding: 1rem 1rem 3.5rem 1rem;
+        }
+
+        /* Screen Transitions */
+        .quest-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .quest-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------------------------------
+           STAGE 1A: PARCHMENT SCROLL (starter.png)
+           --------------------------------------------------------- */
+        .scroll-wrapper {
+            max-width: 660px;
+            margin: 2.5rem auto;
+            position: relative;
+            filter: drop-shadow(0 15px 35px rgba(74, 44, 23, 0.35));
+            animation: scrollUnroll 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes scrollUnroll {
+            from {
+                opacity: 0;
+                transform: scale(0.94) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .scroll-bg-img {
+            width: 100%;
+            display: block;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .scroll-content-overlay {
+            position: absolute;
+            inset: 12% 10% 12% 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+            color: #2b180a;
+        }
+
+        .scroll-eyebrow {
+            font-family: var(--font-cursive);
+            font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+            color: #8b263e;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .scroll-title {
+            font-family: var(--font-heading);
+            font-size: clamp(1.2rem, 3.2vw, 1.8rem);
+            font-weight: 700;
+            color: #2b180a;
+            line-height: 1.25;
+            margin-bottom: 0.8rem;
+        }
+
+        .scroll-body {
+            font-family: var(--font-body);
+            font-size: clamp(1rem, 2.2vw, 1.18rem);
+            color: #4a2e16;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .scroll-body.highlight {
+            font-weight: 700;
+            color: #1a0f06;
+            font-style: normal;
+        }
+
+        .scroll-btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            z-index: 10;
+        }
+
+        /* ---------------------------------------------------------
+           STAGE 1B: VINTAGE LETTER CARD
+           --------------------------------------------------------- */
+        .vintage-card {
+            max-width: 680px;
+            margin: 3rem auto;
+            padding: clamp(2rem, 5vw, 3.2rem);
+            text-align: center;
+        }
+
+        .vintage-card-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: #3b2210;
+        }
+
+        .vintage-p {
+            color: var(--text-muted);
+            font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+            line-height: 1.7;
+            margin-bottom: 1.4rem;
+        }
+
+        /* ---------------------------------------------------------
+           STAGE 2: PUZZLE #01 (5x4 IMAGE PUZZLE)
+           --------------------------------------------------------- */
+        .puzzle-header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .puzzle-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 310px;
+            gap: 1.6rem;
+            align-items: start;
+        }
+
+        .board-container {
+            padding: 1.4rem;
+        }
+
+        .puzzle-controls {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .puzzle-stats-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .puzzle-stat-box {
+            flex: 1;
+            background: rgba(255, 248, 235, 0.95);
+            border: 1px solid rgba(198, 138, 44, 0.4);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem;
+            text-align: center;
+        }
+
+        .puzzle-stat-box strong {
+            display: block;
+            font-size: 1.35rem;
+            font-family: var(--font-heading);
+            color: var(--accent-crimson);
+        }
+
+        .puzzle-stat-box span {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* 8 Rows x 6 Cols Board */
+        .board-frame {
+            background: #eddcc4;
+            border: 2px solid rgba(198, 138, 44, 0.6);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            box-shadow: inset 0 2px 10px rgba(74, 44, 23, 0.25);
+        }
+
+        #puzzleBoard {
+            width: 100%;
+            aspect-ratio: 6 / 8;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 3px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #dfcbb0;
+        }
+
+        .puzzle-slot {
+            position: relative;
+            border: 1px dashed rgba(139, 90, 43, 0.4);
+            background: rgba(255, 255, 255, 0.35);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .puzzle-slot.over {
+            border-color: #8b263e;
+            background: rgba(139, 38, 62, 0.2);
+            box-shadow: inset 0 0 0 2px rgba(139, 38, 62, 0.4);
+        }
+
+        .puzzle-slot.correct {
+            border: 1px solid rgba(45, 106, 79, 0.8);
+        }
+
+        .puzzle-slot.hint-target {
+            border-color: var(--accent-crimson);
+            box-shadow: inset 0 0 0 3px rgba(139, 38, 62, 0.6);
+            animation: hintPulse 0.7s ease-in-out 4;
+        }
+
+        .puzzle-slot img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Pieces Tray */
+        .pieces-tray {
+            padding: 1.3rem;
+            margin-top: 1.4rem;
+        }
+
+        .tray-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.9rem;
+        }
+
+        .tray-head strong {
+            font-size: 1.05rem;
+            font-family: var(--font-heading);
+            color: #2b180d;
+        }
+
+        .tray-head span {
+            color: var(--text-dim);
+            font-size: 0.82rem;
+        }
+
+        #piecesPool {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        .puzzle-piece {
+            position: relative;
+            aspect-ratio: 1 / 1.25;
+            overflow: hidden;
+            border: 2px solid rgba(198, 138, 44, 0.5);
+            border-radius: 8px;
+            background: #ebd8be;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            transition: transform 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .puzzle-piece img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .puzzle-piece.selected {
+            border-color: var(--accent-crimson);
+            box-shadow: 0 0 0 3px rgba(139, 38, 62, 0.4);
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .puzzle-piece.hint-piece {
+            border-color: var(--accent-crimson);
+            box-shadow: 0 0 0 4px rgba(139, 38, 62, 0.5);
+            animation: hintPulse 0.7s ease-in-out 4;
+        }
+
+        .puzzle-piece.placed {
+            opacity: 0.25;
+            filter: grayscale(0.7);
+            pointer-events: none;
+        }
+
+        .piece-badge {
+            position: absolute;
+            right: 3px;
+            bottom: 3px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background: rgba(43, 24, 13, 0.85);
+            font-size: 8px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* Preview Sidebar */
+        .preview-sidebar {
+            padding: 1.3rem;
+        }
+
+        .preview-img-wrap {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 2px solid rgba(198, 138, 44, 0.5);
+            background: #fff;
+            margin: 0.9rem 0;
+            box-shadow: 0 8px 25px rgba(74, 44, 23, 0.15);
+        }
+
+        .preview-img-wrap img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Drag Ghost */
+        .puzzle-drag-ghost {
+            position: fixed;
+            z-index: 10000;
+            width: 82px;
+            aspect-ratio: 1 / 1.25;
+            overflow: hidden;
+            border: 2px solid #8b263e;
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            transform: translate(-50%, -50%) rotate(2deg) scale(1.05);
+        }
+
+        .puzzle-drag-ghost img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        @keyframes hintPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(0.93);
+            }
+        }
+
+        /* Roast modal */
+        .roast-meme-img {
+            width: min(100%, 270px);
+            border-radius: var(--radius-md);
+            margin: 1.2rem auto;
+            box-shadow: 0 10px 30px rgba(74, 44, 23, 0.35);
+            border: 2px solid var(--accent-crimson);
+            display: block;
+        }
+
+        @media (max-width: 860px) {
+            .puzzle-grid-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-sidebar {
+                order: 3;
+            }
+
+            #piecesPool {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .scroll-content-overlay {
+                inset: 16% 8% 16% 8%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quest-ambient-bg"></div>
+
+    <main class="page-container">
+
+        <!-- =========================================================
+             STAGE 1A: THE VINTAGE SCROLL WELCOME (starter.png)
+             ========================================================= -->
+        <section id="welcomeScreenA" class="quest-section active">
+            <div class="scroll-wrapper">
+                <img src="starter.png" alt="Ancient Parchment Scroll" class="scroll-bg-img">
+                <div class="scroll-content-overlay">
+                    <div class="scroll-eyebrow">Hello 🤏🏻</div>
+                    <h1 class="scroll-title">Did you really think I'd create this again for you?</h1>
+
+                    <p class="scroll-body">
+                        Seriously? Hell no. Who would waste their precious time for you? 🙄
+                    </p>
+                    <p class="scroll-body highlight">
+                        Did you actually expect me to?
+                    </p>
+
+                    <div class="scroll-btn-group">
+                        <button id="welcomeYesBtn" class="btn-quest btn-quest-gold">
+                            YES 😎
+                        </button>
+                        <button id="welcomeNoBtn" class="btn-quest btn-quest-pink">
+                            NO 🥺
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             STAGE 1B: BIRTHDAY REVEAL NOTE
+             ========================================================= -->
+        <section id="welcomeScreenB" class="quest-section vintage-card glass-card">
+            <div class="eyebrow">✨ Yes, I know who that stupid is.</div>
+            <h1 class="vintage-card-title">That stupid “I'm.”</h1>
+
+            <p class="vintage-p"
+                style="font-size: 1.4rem; color: #8b263e; font-weight: 700; line-height: 1.4; margin: 0.8rem 0;">
+                Btw... Happy Birthday, Miss Anjali Chandwani! 🎂
+            </p>
+            <p class="vintage-p">
+                I have something prepared so enjoy and use your little mind (if you have one 😛).
+            </p>
+
+            <div class="scroll-btn-group" style="margin-top: 2rem;">
+                <button id="letsGoBtn" class="btn-quest btn-quest-gold"
+                    style="font-size: 1.1rem; padding: 0.9rem 2.8rem;">
+                    Let's Go
+                </button>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             STAGE 2: PUZZLE #01 (8x6 IMAGE PUZZLE)
+             ========================================================= -->
+        <section id="puzzleSection" class="quest-section">
+            <div class="puzzle-header">
+                <div class="eyebrow">🧩 PUZZLE #01</div>
+                <h1 style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0.5rem; color: #2b180d;">
+                    Solve the Memory Puzzle
+                </h1>
+                <p
+                    style="color: var(--text-muted); font-size: 1.1rem; max-width: 680px; margin: 0 auto 0.5rem auto; line-height: 1.65;">
+                    Did you remember that you once told me you wanted to solve 1,000 puzzles?<br>
+                    Because of your time constraints, here is a smaller one handcrafted just for you. 😏
+                </p>
+                <p
+                    style="color: var(--text-dim); font-size: 0.92rem; max-width: 580px; margin: 0 auto 1.2rem auto; font-style: italic;">
+                    — and yes, you have that pretty picture sitting there, supposedly hiding from the world. If I were
+                    you, I'd definitely use it as my profile picture. Just saying. 🙃
+                </p>
+            </div>
+
+            <div class="puzzle-grid-layout">
+                <!-- Left Board & Pieces -->
+                <div>
+                    <div class="glass-card board-container">
+                        <div class="puzzle-controls">
+                            <button id="hintBtn" class="btn-quest btn-quest-secondary btn-sm" type="button">💡
+                                Hint</button>
+                            <button id="shuffleBtn" class="btn-quest btn-quest-secondary btn-sm" type="button">🔀
+                                Shuffle</button>
+                            <button id="resetPuzzleBtn" class="btn-quest btn-quest-secondary btn-sm" type="button">↻
+                                Reset</button>
+                        </div>
+
+                        <div class="puzzle-stats-row">
+                            <div class="puzzle-stat-box">
+                                <strong id="placedCount">0</strong>
+                                <span>Placed</span>
+                            </div>
+                            <div class="puzzle-stat-box">
+                                <strong id="totalCount">48</strong>
+                                <span>Total</span>
+                            </div>
+                            <div class="puzzle-stat-box">
+                                <strong id="hintCount">0</strong>
+                                <span>Hints Used</span>
+                            </div>
+                        </div>
+
+                        <div class="board-frame">
+                            <div id="puzzleBoard" aria-label="5 rows by 5 columns puzzle board"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pieces Tray -->
+                    <div class="glass-card pieces-tray">
+                        <div class="tray-head">
+                            <strong>Puzzle Pieces</strong>
+                            <span id="remainingCountText">48 pieces remaining</span>
+                        </div>
+                        <div id="piecesPool"></div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Reference Image -->
+                <aside class="glass-card preview-sidebar">
+                    <div class="eyebrow">Reference Photo</div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 0.2rem; color: #2b180d;">Profile Picture</h3>
+                    <p style="color: var(--text-dim); font-size: 0.88rem;">
+                        Keep this reference handy while assembling your puzzle!
+                    </p>
+
+                    <div class="preview-img-wrap">
+                        <img src="miss_chand.png" alt="Target memory preview" id="refPreviewImg">
+                    </div>
+
+                    <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.45;">
+                        Tip: Click or drag any piece to place it on its corresponding grid slot!
+                    </p>
+
+                    <!-- Compliment card -->
+                    <div
+                        style="margin-top: 1.2rem; padding: 1rem 1.1rem; background: rgba(139, 38, 62, 0.08); border: 1px solid rgba(139, 38, 62, 0.25); border-radius: var(--radius-md);">
+                        <p
+                            style="color: #8b263e; font-family: var(--font-cursive); font-size: 1.6rem; margin: 0; line-height: 1.35;">
+                            "I don't know if someone has told you this, but that is genuinely one of the cutest and
+                            prettiest pictures you have (a little aesthetic, but really sweet)." 🌸
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================
+         MODAL: FUNNY ROAST ON "NO"
+         ========================================================= -->
+    <div id="roastModal" class="quest-modal-backdrop">
+        <div class="quest-modal">
+            <div class="eyebrow" style="color: var(--accent-crimson);">Caught You!</div>
+            <h2 style="font-size: 1.7rem; margin-top: 0.4rem; color: #2b180d;">Did you really click NO? 😂</h2>
+            <img src="funny_roast.jpeg" alt="Sassy Cat Meme" class="roast-meme-img">
+            <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                Are you serious? We both know that's not true. Go back, make your choice, and admit it!
+            </p>
+            <button id="roastGoBackBtn" class="btn-quest btn-quest-gold" style="width: 100%;">
+                Go Back & Choose YES 👈
+            </button>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         MODAL: PUZZLE #01 WIN REVEAL
+         ========================================================= -->
+    <div id="puzzleWinModal" class="quest-modal-backdrop">
+        <div class="quest-modal">
+            <div class="eyebrow" style="color: #2d6a4f;">🎉 PUZZLE #01 SOLVED</div>
+            <h2 style="font-size: 1.9rem; margin: 0.4rem 0 0.8rem 0; color: #2b180d;">Memory Restored!</h2>
+
+            <div
+                style="background: rgba(198, 138, 44, 0.12); border: 1px solid rgba(198, 138, 44, 0.4); border-radius: var(--radius-md); padding: 1.3rem; margin: 1.2rem 0;">
+                <p
+                    style="font-size: 1.35rem; font-weight: 800; color: var(--accent-crimson); margin-bottom: 0.4rem; font-family: var(--font-heading);">
+                    Remember this image carefully. 🧠
+                </p>
+                <p style="font-size: 1rem; color: var(--text-muted);">
+                    You will need clues from this portrait in your subsequent cipher quests!
+                </p>
+            </div>
+
+            <button id="iRememberBtn" class="btn-quest btn-quest-gold"
+                style="width: 100%; font-size: 1.1rem; padding: 0.9rem;">
+                I Remember 🧠 ➔ Enter Quest Hub
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="quest-core.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const state = QuestState.get();
+
+            // Inject Vintage HUD
+            injectQuestHUD(state.welcomeDone ? 2 : 1);
+            injectFloatingLilies(8);
+
+            const welcomeA = document.getElementById('welcomeScreenA');
+            const welcomeB = document.getElementById('welcomeScreenB');
+            const puzzleSection = document.getElementById('puzzleSection');
+            const roastModal = document.getElementById('roastModal');
+            const puzzleWinModal = document.getElementById('puzzleWinModal');
+
+            // Navigation helpers
+            function showScreen(screen) {
+                [welcomeA, welcomeB, puzzleSection].forEach(s => s.classList.remove('active'));
+                screen.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Check URL hash or state to skip welcome if already done
+            if (window.location.hash === '#puzzle-section' || state.welcomeDone) {
+                showScreen(puzzleSection);
+                injectQuestHUD(2);
+            }
+
+            // --- WELCOME FLOW EVENTS ---
+            document.getElementById('welcomeNoBtn').addEventListener('click', () => {
+                QuestAudio.playTone(320, 'sawtooth', 0.25, 0.15);
+                roastModal.classList.add('show');
+            });
+
+            document.getElementById('roastGoBackBtn').addEventListener('click', () => {
+                QuestAudio.playClick();
+                roastModal.classList.remove('show');
+            });
+
+            document.getElementById('welcomeYesBtn').addEventListener('click', () => {
+                QuestAudio.playSuccess();
+                showScreen(welcomeB);
+            });
+
+            document.getElementById('letsGoBtn').addEventListener('click', () => {
+                QuestAudio.playSuccess();
+                QuestState.setWelcomeDone();
+                showScreen(puzzleSection);
+                injectQuestHUD(2);
+                showToast("Puzzle #01: Assemble all 48 pieces! 🧩");
+            });
+
+            // --- PUZZLE #01 ENGINE (8x6) ---
+            const ROWS = 5;
+            const COLS = 5;
+            const TOTAL_PIECES = ROWS * COLS;
+
+            const board = document.getElementById('puzzleBoard');
+            const piecesPool = document.getElementById('piecesPool');
+            const placedCountEl = document.getElementById('placedCount');
+            const totalCountEl = document.getElementById('totalCount');
+            const hintCountEl = document.getElementById('hintCount');
+            const remainingCountText = document.getElementById('remainingCountText');
+
+            let pieces = [];
+            let placed = new Set();
+            let hintCount = 0;
+            let activeDrag = null;
+            let latestPointer = { x: 0, y: 0 };
+            let autoScrollFrame = null;
+            let selectedPieceForClick = null;
+
+            function pieceSrc(row, col) {
+                return `images_final/miss_chand_r${row}_c${col}.png`;
+            }
+
+            function initPuzzle() {
+                board.innerHTML = '';
+                piecesPool.innerHTML = '';
+                placed.clear();
+                hintCount = 0;
+                pieces = [];
+
+                // Create board slots
+                for (let r = 1; r <= ROWS; r++) {
+                    for (let c = 1; c <= COLS; c++) {
+                        const id = `r${r}c${c}`;
+                        pieces.push({
+                            id,
+                            row: r,
+                            col: c,
+                            src: pieceSrc(r, c)
+                        });
+
+                        const slot = document.createElement('div');
+                        slot.className = 'puzzle-slot';
+                        slot.dataset.id = id;
+                        slot.dataset.row = r;
+                        slot.dataset.col = c;
+                        slot.setAttribute('aria-label', `Slot row ${r}, col ${c}`);
+
+                        slot.addEventListener('click', () => handleSlotClick(slot));
+
+                        board.appendChild(slot);
+                    }
+                }
+
+                shuffleArray(pieces);
+                renderPieces();
+                updateStats();
+            }
+
+            function renderPieces() {
+                piecesPool.innerHTML = '';
+                pieces.forEach(p => {
+                    const el = document.createElement('div');
+                    el.className = 'puzzle-piece';
+                    el.dataset.id = p.id;
+                    el.dataset.row = p.row;
+                    el.dataset.col = p.col;
+                    el.setAttribute('role', 'button');
+
+                    const img = document.createElement('img');
+                    img.src = p.src;
+                    img.alt = `Piece ${p.row},${p.col}`;
+                    img.draggable = false;
+
+                    const badge = document.createElement('div');
+                    badge.className = 'piece-badge';
+                    badge.textContent = `${p.row},${p.col}`;
+
+                    el.append(img, badge);
+                    piecesPool.appendChild(el);
+
+                    el.addEventListener('pointerdown', startDrag, { passive: false });
+
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handlePieceSelect(el, p);
+                    });
+                });
+            }
+
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+
+            function updateStats() {
+                placedCountEl.textContent = placed.size;
+                totalCountEl.textContent = TOTAL_PIECES;
+                hintCountEl.textContent = hintCount;
+                const rem = TOTAL_PIECES - placed.size;
+                remainingCountText.textContent = `${rem} piece${rem === 1 ? '' : 's'} remaining`;
+            }
+
+            function handlePieceSelect(pieceEl, piece) {
+                if (placed.has(piece.id)) return;
+
+                document.querySelectorAll('.puzzle-piece.selected').forEach(el => el.classList.remove('selected'));
+                if (selectedPieceForClick && selectedPieceForClick.id === piece.id) {
+                    selectedPieceForClick = null;
+                } else {
+                    selectedPieceForClick = piece;
+                    pieceEl.classList.add('selected');
+                    QuestAudio.playClick();
+
+                    const boardEl = document.querySelector('.board-frame');
+                    if (boardEl) {
+                        boardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+
+                    const targetSlot = document.querySelector(`.puzzle-slot[data-id="${piece.id}"]`);
+                    if (targetSlot) {
+                        targetSlot.classList.add('over');
+                        setTimeout(() => targetSlot.classList.remove('over'), 1400);
+                    }
+
+                    showToast(`Selected (${piece.row},${piece.col}). Tap its slot on the board!`);
+                }
+            }
+
+            function handleSlotClick(slot) {
+                if (!selectedPieceForClick) return;
+
+                if (slot.dataset.id === selectedPieceForClick.id && !slot.querySelector('img')) {
+                    placePiece(selectedPieceForClick, slot);
+                    selectedPieceForClick = null;
+                    document.querySelectorAll('.puzzle-piece.selected').forEach(el => el.classList.remove('selected'));
+                } else {
+                    QuestAudio.playTone(280, 'sawtooth', 0.15, 0.1);
+                    slot.classList.add('over');
+                    setTimeout(() => slot.classList.remove('over'), 280);
+                    showToast('Not quite! Match row and column coordinates.');
+                }
+            }
+
+            function placePiece(piece, slot) {
+                const img = document.createElement('img');
+                img.src = piece.src;
+                img.alt = '';
+                img.draggable = false;
+
+                slot.appendChild(img);
+                slot.classList.add('correct');
+                placed.add(piece.id);
+
+                const pieceEl = document.querySelector(`.puzzle-piece[data-id="${piece.id}"]`);
+                if (pieceEl) pieceEl.classList.add('placed');
+
+                QuestAudio.playDrop();
+                updateStats();
+
+                if (placed.size === TOTAL_PIECES) {
+                    triggerWin();
+                }
+            }
+
+            function triggerWin() {
+                QuestState.setImagePuzzleDone();
+                triggerQuestConfetti(4500);
+                setTimeout(() => {
+                    puzzleWinModal.classList.add('show');
+                }, 700);
+            }
+
+            document.getElementById('iRememberBtn').addEventListener('click', () => {
+                QuestAudio.playSuccess();
+                window.location.href = 'hub.html';
+            });
+
+            /* AUTOMATIC PAGE SCROLL WHILE DRAGGING */
+            function startAutoScroll() {
+                if (autoScrollFrame) return;
+
+                const tick = () => {
+                    if (!activeDrag) {
+                        autoScrollFrame = null;
+                        return;
+                    }
+
+                    const y = latestPointer.y;
+                    const height = window.innerHeight;
+                    const edge = 110;
+                    let amount = 0;
+
+                    if (y < edge) {
+                        const intensity = Math.max(0, edge - y) / edge;
+                        amount = -Math.max(3.5, 20 * intensity);
+                    } else if (y > height - edge) {
+                        const intensity = Math.max(0, y - (height - edge)) / edge;
+                        amount = Math.max(3.5, 20 * intensity);
+                    }
+
+                    if (amount !== 0) {
+                        window.scrollBy(0, amount);
+
+                        document.querySelectorAll('.puzzle-slot.over').forEach(s => s.classList.remove('over'));
+                        const slot = getSlotUnder(latestPointer.x, latestPointer.y);
+                        if (slot && !slot.querySelector('img')) {
+                            slot.classList.add('over');
+                        }
+                    }
+
+                    autoScrollFrame = requestAnimationFrame(tick);
+                };
+
+                autoScrollFrame = requestAnimationFrame(tick);
+            }
+
+            function stopAutoScroll() {
+                if (autoScrollFrame) {
+                    cancelAnimationFrame(autoScrollFrame);
+                    autoScrollFrame = null;
+                }
+            }
+
+            // Drag & drop logic
+            function startDrag(event) {
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                const pieceEl = event.currentTarget;
+                const id = pieceEl.dataset.id;
+                if (placed.has(id)) return;
+
+                event.preventDefault();
+                latestPointer.x = event.clientX;
+                latestPointer.y = event.clientY;
+
+                activeDrag = {
+                    id,
+                    pieceEl,
+                    pointerId: event.pointerId,
+                    ghost: null
+                };
+
+                pieceEl.classList.add('selected');
+                try { pieceEl.setPointerCapture(event.pointerId); } catch (_) { }
+
+                const ghost = document.createElement('div');
+                ghost.className = 'puzzle-drag-ghost';
+                const ghostImg = document.createElement('img');
+                ghostImg.src = pieceEl.querySelector('img').src;
+                ghost.appendChild(ghostImg);
+                ghost.style.left = `${event.clientX}px`;
+                ghost.style.top = `${event.clientY}px`;
+                document.body.appendChild(ghost);
+                activeDrag.ghost = ghost;
+
+                startAutoScroll();
+
+                window.addEventListener('pointermove', moveDrag, { passive: false });
+                window.addEventListener('pointerup', endDrag, { passive: false });
+                window.addEventListener('pointercancel', cleanupDrag, { passive: false });
+            }
+
+            function moveDrag(event) {
+                if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+                event.preventDefault();
+                latestPointer.x = event.clientX;
+                latestPointer.y = event.clientY;
+
+                if (activeDrag.ghost) {
+                    activeDrag.ghost.style.left = `${event.clientX}px`;
+                    activeDrag.ghost.style.top = `${event.clientY}px`;
+                }
+
+                document.querySelectorAll('.puzzle-slot.over').forEach(s => s.classList.remove('over'));
+                const slot = getSlotUnder(event.clientX, event.clientY);
+                if (slot && !slot.querySelector('img')) {
+                    slot.classList.add('over');
+                }
+            }
+
+            function endDrag(event) {
+                if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+                event.preventDefault();
+
+                const drag = activeDrag;
+                const slot = getSlotUnder(event.clientX, event.clientY);
+                cleanupDrag();
+
+                if (!slot) return;
+
+                const piece = pieces.find(p => p.id === drag.id);
+                if (!piece) return;
+
+                if (slot.dataset.id === piece.id && !slot.querySelector('img')) {
+                    placePiece(piece, slot);
+                } else {
+                    QuestAudio.playTone(260, 'sawtooth', 0.12, 0.1);
+                    slot.classList.add('over');
+                    setTimeout(() => slot.classList.remove('over'), 260);
+                    showToast('Not quite! Match row and column coordinates.');
+                }
+            }
+
+            function cleanupDrag() {
+                if (!activeDrag) return;
+                stopAutoScroll();
+                activeDrag.pieceEl.classList.remove('selected');
+                if (activeDrag.ghost) activeDrag.ghost.remove();
+                document.querySelectorAll('.puzzle-slot.over').forEach(s => s.classList.remove('over'));
+
+                window.removeEventListener('pointermove', moveDrag);
+                window.removeEventListener('pointerup', endDrag);
+                window.removeEventListener('pointercancel', cleanupDrag);
+                activeDrag = null;
+            }
+
+            function getSlotUnder(x, y) {
+                const els = document.elementsFromPoint(x, y);
+                return els.find(el => el.classList && el.classList.contains('puzzle-slot'));
+            }
+
+            // Controls
+            document.getElementById('hintBtn').addEventListener('click', () => {
+                if (placed.size === TOTAL_PIECES) return;
+                const unplaced = pieces.find(p => !placed.has(p.id));
+                if (!unplaced) return;
+
+                hintCount++;
+                updateStats();
+
+                document.querySelectorAll('.hint-piece, .hint-target').forEach(el => el.classList.remove('hint-piece', 'hint-target'));
+
+                const pieceEl = document.querySelector(`.puzzle-piece[data-id="${unplaced.id}"]`);
+                const slot = document.querySelector(`.puzzle-slot[data-id="${unplaced.id}"]`);
+
+                pieceEl?.classList.add('hint-piece');
+                slot?.classList.add('hint-target');
+                showToast(`💡 Hint: Row ${unplaced.row}, Col ${unplaced.col}`);
+
+                setTimeout(() => {
+                    pieceEl?.classList.remove('hint-piece');
+                    slot?.classList.remove('hint-target');
+                }, 3200);
+            });
+
+            document.getElementById('shuffleBtn').addEventListener('click', () => {
+                const remaining = pieces.filter(p => !placed.has(p.id));
+                shuffleArray(remaining);
+                let idx = 0;
+                pieces = pieces.map(p => placed.has(p.id) ? p : remaining[idx++]);
+                renderPieces();
+                pieces.forEach(p => {
+                    if (placed.has(p.id)) {
+                        document.querySelector(`.puzzle-piece[data-id="${p.id}"]`)?.classList.add('placed');
+                    }
+                });
+                showToast('Pieces shuffled 🔀');
+            });
+
+            document.getElementById('resetPuzzleBtn').addEventListener('click', () => {
+                if (confirm('Reset the puzzle board?')) {
+                    initPuzzle();
+                    showToast('Puzzle reset. Good luck! 🧩');
+                }
+            });
+
+            document.addEventListener('dragstart', e => e.preventDefault());
+
+            initPuzzle();
+        });
+    </script>
+</body>
+
+</html>

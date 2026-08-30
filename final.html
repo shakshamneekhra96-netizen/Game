@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>Happy Birthday Anjali! ❤️ - Birthday Celebration</title>
+    <link rel="stylesheet" href="quest-core.css">
+    <style>
+        .finale-container {
+            width: min(100%, 860px);
+            margin: 0 auto;
+            padding: 1.5rem 1.2rem 5rem 1.2rem;
+        }
+
+        .finale-header {
+            text-align: center;
+            margin: 1rem auto 2.4rem auto;
+        }
+
+        .finale-title {
+            font-size: clamp(2rem, 6vw, 3rem);
+            line-height: 1.25;
+            margin: 0.3rem 0 0.6rem 0;
+            color: #2b180d;
+        }
+
+        .finale-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* -------------------------------------------------------------
+           PAGES / STEPS
+           ------------------------------------------------------------- */
+        .finale-step {
+            display: none;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .finale-step.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -------------------------------------------------------------
+           STEP 1: PERSONAL NOTE SECTION (personal_note.png)
+           ------------------------------------------------------------- */
+        .note-card-section {
+            padding: clamp(1.4rem, 4vw, 2.5rem);
+            margin-bottom: 2.5rem;
+            position: relative;
+            background: var(--card-bg-warm);
+            border: 2px solid rgba(198, 138, 44, 0.5);
+            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius-lg);
+            text-align: center;
+        }
+
+        .note-card-img-wrap {
+            margin: 1.5rem auto;
+            max-width: 720px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 2px solid rgba(198, 138, 44, 0.45);
+            box-shadow: 0 15px 40px rgba(74, 44, 23, 0.16);
+            background: #fffaf0;
+        }
+
+        .note-card-img-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* -------------------------------------------------------------
+           FLOATING VOICE NOTE PILL (MOBILE & DESKTOP)
+           ------------------------------------------------------------- */
+        .floating-voice-pill {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #8b263e, #c68a2c);
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.3rem;
+            border-radius: var(--radius-pill);
+            box-shadow: 0 8px 25px rgba(139, 38, 62, 0.4);
+            font-family: var(--font-handwriting);
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .floating-voice-pill:hover {
+            transform: scale(1.06);
+            box-shadow: 0 12px 30px rgba(139, 38, 62, 0.5);
+        }
+
+        /* -------------------------------------------------------------
+           VOICE NOTE PLAYER (EXPANDABLE)
+           ------------------------------------------------------------- */
+        .voicenote-card {
+            display: none;
+            padding: 1.8rem 1.6rem;
+            border: 2px solid rgba(198, 138, 44, 0.5);
+            box-shadow: 0 15px 40px rgba(74, 44, 23, 0.14);
+            margin: 1.8rem auto;
+            max-width: 680px;
+            background: #fffaf0;
+            border-radius: var(--radius-lg);
+            animation: slideDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .voicenote-card.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .voicenote-head {
+            text-align: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .voicenote-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+            color: #2b180d;
+        }
+
+        .voicenote-sub {
+            color: #8b263e;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .custom-player-widget {
+            background: #fcf6eb;
+            border: 1px solid rgba(198, 138, 44, 0.4);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .player-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .btn-play-pause {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b263e, #c68a2c);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 38, 62, 0.3);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-play-pause:hover {
+            transform: scale(1.08);
+        }
+
+        .player-track-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-title {
+            font-weight: 700;
+            font-size: 1.02rem;
+            color: #2b180d;
+            margin-bottom: 5px;
+            font-family: var(--font-heading);
+        }
+
+        .equalizer-stage {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 20px;
+        }
+
+        .equalizer-bar {
+            width: 4px;
+            height: 5px;
+            background: #8b263e;
+            border-radius: 2px;
+            transition: height 0.15s ease;
+        }
+
+        .equalizer-stage.playing .equalizer-bar {
+            animation: equalizerDance 0.8s ease-in-out infinite alternate;
+        }
+
+        .equalizer-bar:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .equalizer-bar:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .equalizer-bar:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        .equalizer-bar:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .equalizer-bar:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        .equalizer-bar:nth-child(6) {
+            animation-delay: 0.4s;
+        }
+
+        .equalizer-bar:nth-child(7) {
+            animation-delay: 0.15s;
+        }
+
+        .equalizer-bar:nth-child(8) {
+            animation-delay: 0.45s;
+        }
+
+        @keyframes equalizerDance {
+            0% {
+                height: 4px;
+            }
+
+            100% {
+                height: 20px;
+            }
+        }
+
+        .scrubber-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .scrubber-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(92, 62, 40, 0.15);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .scrubber-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #8b263e;
+            box-shadow: 0 0 10px rgba(139, 38, 62, 0.4);
+            cursor: pointer;
+        }
+
+        .time-labels-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* -------------------------------------------------------------
+           STEP 2: FINAL PAGE SECTION (final_page.png)
+           ------------------------------------------------------------- */
+        .final-page-section {
+            padding: clamp(1.4rem, 4vw, 2.5rem);
+            text-align: center;
+            border: 2px solid rgba(198, 138, 44, 0.55);
+            background: var(--card-bg-warm);
+            border-radius: var(--radius-lg);
+            margin-bottom: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .final-page-img-wrap {
+            max-width: 580px;
+            margin: 1.5rem auto;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 2px solid rgba(198, 138, 44, 0.5);
+            box-shadow: 0 20px 60px rgba(74, 44, 23, 0.2);
+            background: #fffaf0;
+        }
+
+        .final-page-img-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Bottom Actions */
+        .bottom-actions-row {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quest-ambient-bg"></div>
+
+    <!-- Floating Voice Note Pill for Mobile & Quick Access -->
+    <button class="floating-voice-pill" id="floatingVoiceBtn" aria-label="Listen to Voice Note">
+        <span>🎙️</span> Listen Voice Note
+    </button>
+
+    <main class="finale-container">
+
+        <!-- =========================================================
+             PAGE 1: PERSONAL NOTE & VOICE NOTE BUTTON
+             ========================================================= -->
+        <section id="stepNotePage" class="finale-step active">
+
+            <header class="finale-header">
+                <div class="eyebrow">🎀 HAPPY BIRTHDAY MISS CHANDWANI</div>
+                <h1 class="finale-title">Congrats, you solved all of it! ❤️</h1>
+                <p class="finale-subtitle">
+                    You conquered every single cipher, unlocked your memories, and arrived at your birthday surprise.
+                </p>
+            </header>
+
+            <article class="glass-card note-card-section">
+                <div class="eyebrow" style="color: var(--accent-crimson);">📜 A Small note</div>
+                <h2 style="font-size: 2rem; margin: 0.3rem 0 0.5rem 0; color: #2b180d;">For my good friend </h2>
+                <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 1.2rem auto;">
+                    Every word written especially for your the person I care not the fake one
+                </p>
+
+                <div class="note-card-img-wrap">
+                    <img src="personal_note.png" alt="Handwritten Personal Birthday Letter For Anjali">
+                </div>
+
+                <div style="margin-top: 1.2rem;">
+                    <p
+                        style="font-size: 1.35rem; font-weight: 700; color: #8b263e; margin: 0.8rem 0; font-family: var(--font-heading);">
+                        Happy Saturday & Weekend (Birthday Secondary)! HBD, Miss!! ✨
+                    </p>
+                </div>
+
+
+                <!-- EXPANDABLE VOICE NOTE PLAYER -->
+                <div class="voicenote-card" id="voiceNoteSection">
+                    <div class="voicenote-head">
+                        <div class="eyebrow" style="color: var(--accent-crimson);">🎙️ AUDIO MESSAGE</div>
+                        <h3 class="voicenote-title">A little something I wanted you to hear</h3>
+                        <p class="voicenote-sub">Press play.</p>
+                    </div>
+
+                    <div class="custom-player-widget">
+                        <audio id="questAudioElement" preload="metadata">
+                            <source src="page-flip-47177.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+
+                        <div class="player-controls-row">
+                            <button id="audioPlayPauseBtn" class="btn-play-pause" aria-label="Play audio"
+                                title="Play Voice Note">
+                                <span id="playIcon">▶</span>
+                            </button>
+
+                            <div class="player-track-info">
+                                <div class="track-title">Special Voice Note 🎙️</div>
+                                <div class="equalizer-stage" id="equalizerVisualizer" aria-hidden="true">
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                    <div class="equalizer-bar"></div>
+                                </div>
+                            </div>
+
+                            <button id="audioMuteBtn" class="btn-quest btn-quest-secondary btn-icon" title="Toggle Mute"
+                                aria-label="Mute Audio">
+                                🔊
+                            </button>
+                        </div>
+
+                        <div class="scrubber-container">
+                            <input type="range" id="audioScrubber" class="scrubber-slider" min="0" max="100" value="0"
+                                step="0.1" aria-label="Audio scrubber">
+                            <div class="time-labels-row">
+                                <span id="currentTimeDisplay">0:00</span>
+                                <span id="durationDisplay">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEXT BUTTON TO FINAL PAGE -->
+                <div style="margin-top: 2rem; border-top: 1px solid rgba(198, 138, 44, 0.25); padding-top: 1.5rem;">
+                    <button id="goToFinalPageBtn" class="btn-quest btn-quest-gold"
+                        style="font-size: 1.15rem; padding: 0.95rem 3rem;">
+                        Next: View Birthday Surprise 🎁 ➔
+                    </button>
+                </div>
+
+            </article>
+
+        </section>
+
+        <!-- =========================================================
+             PAGE 2: FINAL PAGE (final_page.png)
+             ========================================================= -->
+        <section id="stepFinalPage" class="finale-step">
+
+            <header class="finale-header">
+                <div class="eyebrow">🎁 SMALL SURPRISE</div>
+                <h1 class="finale-title">Happy Birthday Anjali</h1>
+                <p class="finale-subtitle">
+                    Scan your special birthday QR gift below:
+                </p>
+            </header>
+
+            <article class="glass-card final-page-section">
+                <div class="final-page-img-wrap">
+                    <img src="final_page.png" alt="Happy Birthday Anjali Finale Card">
+                </div>
+
+                <p
+                    style="font-size: 1.6rem; font-weight: 700; color: #8b263e; margin-top: 1.2rem; font-family: var(--font-heading);">
+                    Happy Birthday 🤏
+                </p>
+
+                <!-- CELEBRATION ACTIONS -->
+                <div class="bottom-actions-row">
+                    <button id="triggerConfettiBtn" class="btn-quest btn-quest-gold"
+                        style="padding: 0.85rem 2.2rem; font-size: 1.05rem;">
+                        Celebrate With Confetti 🎊
+                    </button>
+                    <button id="backToNoteBtn" class="btn-quest btn-quest-pink" style="padding: 0.85rem 2rem;">
+                        ⬅ Back to Personal Note
+                    </button>
+                    <a href="hub.html" class="btn-quest btn-quest-secondary" style="padding: 0.85rem 2rem;">
+                        Back to Hub 🏠
+                    </a>
+                </div>
+            </article>
+
+        </section>
+
+    </main>
+
+    <script src="quest-core.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            injectQuestHUD(6);
+            injectFloatingLilies(10);
+
+            const stepNote = document.getElementById('stepNotePage');
+            const stepFinal = document.getElementById('stepFinalPage');
+            const goToFinalBtn = document.getElementById('goToFinalPageBtn');
+            const backToNoteBtn = document.getElementById('backToNoteBtn');
+            const floatingVoiceBtn = document.getElementById('floatingVoiceBtn');
+            const voiceSection = document.getElementById('voiceNoteSection');
+
+            floatingVoiceBtn.addEventListener('click', () => {
+                // Navigate back to note page if on page 2
+                if (!stepNote.classList.contains('active')) {
+                    stepFinal.classList.remove('active');
+                    stepNote.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                // Toggle the player
+                const isVisible = voiceSection.style.display !== 'none' && voiceSection.style.display !== '';
+                if (isVisible) {
+                    voiceSection.style.display = 'none';
+                    floatingVoiceBtn.innerHTML = '<span>🎙️</span> Listen Voice Note';
+                } else {
+                    voiceSection.style.display = 'block';
+                    floatingVoiceBtn.innerHTML = '<span>🎙️</span> Hide Voice Note';
+                    setTimeout(() => voiceSection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+                }
+                QuestAudio.playClick();
+            });
+
+            // Navigation to Final Page
+            goToFinalBtn.addEventListener('click', () => {
+                stepNote.classList.remove('active');
+                stepFinal.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                QuestAudio.playSuccess();
+                setTimeout(() => triggerQuestConfetti(5500), 300);
+            });
+
+            // Navigation back to Note Page
+            backToNoteBtn.addEventListener('click', () => {
+                stepFinal.classList.remove('active');
+                stepNote.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                QuestAudio.playClick();
+            });
+
+            // --- AUDIO PLAYER CONTROLS ---
+            const audio = document.getElementById('questAudioElement');
+            const playBtn = document.getElementById('audioPlayPauseBtn');
+            const playIcon = document.getElementById('playIcon');
+            const muteBtn = document.getElementById('audioMuteBtn');
+            const scrubber = document.getElementById('audioScrubber');
+            const currentTimeEl = document.getElementById('currentTimeDisplay');
+            const durationEl = document.getElementById('durationDisplay');
+            const visualizer = document.getElementById('equalizerVisualizer');
+
+            let isScrubbing = false;
+
+            function formatTime(seconds) {
+                if (isNaN(seconds) || seconds < 0) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            audio.addEventListener('loadedmetadata', () => {
+                durationEl.textContent = formatTime(audio.duration);
+            });
+
+            playBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        playIcon.textContent = '⏸';
+                        visualizer.classList.add('playing');
+                    }).catch(err => {
+                        console.warn('Playback prevented:', err);
+                    });
+                } else {
+                    audio.pause();
+                    playIcon.textContent = '▶';
+                    visualizer.classList.remove('playing');
+                }
+            });
+
+            audio.addEventListener('timeupdate', () => {
+                if (!isScrubbing && audio.duration) {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    scrubber.value = progress;
+                    currentTimeEl.textContent = formatTime(audio.currentTime);
+                }
+            });
+
+            scrubber.addEventListener('input', () => {
+                isScrubbing = true;
+                if (audio.duration) {
+                    const seekTime = (scrubber.value / 100) * audio.duration;
+                    currentTimeEl.textContent = formatTime(seekTime);
+                }
+            });
+
+            scrubber.addEventListener('change', () => {
+                if (audio.duration) {
+                    audio.currentTime = (scrubber.value / 100) * audio.duration;
+                }
+                isScrubbing = false;
+            });
+
+            audio.addEventListener('ended', () => {
+                playIcon.textContent = '▶';
+                visualizer.classList.remove('playing');
+                scrubber.value = 0;
+                currentTimeEl.textContent = '0:00';
+            });
+
+            muteBtn.addEventListener('click', () => {
+                audio.muted = !audio.muted;
+                muteBtn.textContent = audio.muted ? '🔇' : '🔊';
+            });
+
+            document.getElementById('triggerConfettiBtn').addEventListener('click', () => {
+                triggerQuestConfetti(4500);
+            });
+        });
+    </script>
+</body>
+
+</html>
