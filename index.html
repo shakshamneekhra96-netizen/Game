@@ -855,15 +855,17 @@
 
                     const y = latestPointer.y;
                     const height = window.innerHeight;
-                    const edge = 110;
+                    // Give touch users a larger trigger area and a faster
+                    // page movement while carrying a piece to the board.
+                    const edge = 150;
                     let amount = 0;
 
                     if (y < edge) {
                         const intensity = Math.max(0, edge - y) / edge;
-                        amount = -Math.max(3.5, 20 * intensity);
+                        amount = -Math.max(7, 38 * intensity);
                     } else if (y > height - edge) {
                         const intensity = Math.max(0, y - (height - edge)) / edge;
-                        amount = Math.max(3.5, 20 * intensity);
+                        amount = Math.max(7, 38 * intensity);
                     }
 
                     if (amount !== 0) {
