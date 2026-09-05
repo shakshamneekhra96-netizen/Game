@@ -73,10 +73,110 @@
             background: #fffaf0;
         }
 
+        .note-card-img-wrap {
+            position: relative;
+        }
+
         .note-card-img-wrap img {
             width: 100%;
             height: auto;
             display: block;
+        }
+
+        .note-fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            background: rgba(43, 24, 13, 0.68);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .note-fullscreen-btn:hover {
+            transform: scale(1.06);
+        }
+
+        .note-image-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            background: #000;
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+
+        .note-image-overlay.show {
+            display: flex;
+        }
+
+        .note-image-overlay img {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            margin: 0;
+            padding: 0;
+            object-fit: contain;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .note-image-close-btn {
+            position: absolute;
+            top: max(14px, env(safe-area-inset-top));
+            right: max(14px, env(safe-area-inset-right));
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        body.note-image-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 600px) {
+            .note-image-close-btn {
+                top: max(12px, env(safe-area-inset-top));
+                right: max(12px, env(safe-area-inset-right));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .note-card-img-wrap {
+                max-width: 88%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .note-card-img-wrap {
+                max-width: 84%;
+            }
         }
 
         /* -------------------------------------------------------------
@@ -362,18 +462,29 @@
                 <div class="eyebrow">🎀 HAPPY BIRTHDAY MISS CHANDWANI</div>
                 <h1 class="finale-title">Congrats, you solved all of it! ❤️</h1>
                 <p class="finale-subtitle">
-                    You conquered every single cipher, unlocked your memories, and arrived at your birthday surprise.
+                    Someone has a pretty good brain, I guess. I hope you enjoy it a little bit.
                 </p>
             </header>
 
             <article class="glass-card note-card-section">
                 <div class="eyebrow" style="color: var(--accent-crimson);">📜 A Small note</div>
-                <h2 style="font-size: 2rem; margin: 0.3rem 0 0.5rem 0; color: #2b180d;">For my good friend </h2>
+                <h2 style="font-size: 2rem; margin: 0.3rem 0 0.5rem 0; color: #2b180d;">For someone special (Fake dost)
+                </h2>
                 <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 1.2rem auto;">
-                    Every word written especially for your the person I care not the fake one
+                    Instead of making it boring, I just wanted to make it a little more interesting.
                 </p>
 
                 <div class="note-card-img-wrap">
+                    <img src="personal_note.png" alt="Handwritten Personal Birthday Letter For Anjali"
+                        id="personalNoteImage">
+                    <button class="note-fullscreen-btn" id="personalNoteFullscreenBtn" type="button"
+                        aria-label="View personal note fullscreen" title="View fullscreen">⛶</button>
+                </div>
+
+                <div class="note-image-overlay" id="noteImageOverlay" role="dialog" aria-modal="true"
+                    aria-label="Personal note fullscreen view">
+                    <button class="note-image-close-btn" id="noteImageCloseBtn" type="button"
+                        aria-label="Close fullscreen">✕</button>
                     <img src="personal_note.png" alt="Handwritten Personal Birthday Letter For Anjali">
                 </div>
 
@@ -549,6 +660,62 @@
             const currentTimeEl = document.getElementById('currentTimeDisplay');
             const durationEl = document.getElementById('durationDisplay');
             const visualizer = document.getElementById('equalizerVisualizer');
+
+            const personalNoteFullscreenBtn = document.getElementById('personalNoteFullscreenBtn');
+            const noteImageOverlay = document.getElementById('noteImageOverlay');
+            const noteImageCloseBtn = document.getElementById('noteImageCloseBtn');
+
+            function openPersonalNoteFullscreen() {
+                noteImageOverlay.classList.add('show');
+                document.body.classList.add('note-image-open');
+            }
+
+            function closePersonalNoteFullscreen() {
+                noteImageOverlay.classList.remove('show');
+                document.body.classList.remove('note-image-open');
+            }
+
+            personalNoteFullscreenBtn.addEventListener('click', openPersonalNoteFullscreen);
+            noteImageCloseBtn.addEventListener('click', closePersonalNoteFullscreen);
+
+            let noteReaderHistoryOpen = false;
+
+            function closePersonalNoteFullscreenAndHistory() {
+                noteImageOverlay.classList.remove('show');
+                document.body.classList.remove('note-image-open');
+
+                if (noteReaderHistoryOpen) {
+                    noteReaderHistoryOpen = false;
+                    history.back();
+                }
+            }
+
+            noteImageOverlay.addEventListener('click', (event) => {
+                if (event.target === noteImageOverlay) {
+                    closePersonalNoteFullscreenAndHistory();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && noteImageOverlay.classList.contains('show')) {
+                    closePersonalNoteFullscreenAndHistory();
+                }
+            });
+
+            personalNoteFullscreenBtn.addEventListener('click', () => {
+                if (!noteReaderHistoryOpen) {
+                    history.pushState({ personalNoteReader: true }, '');
+                    noteReaderHistoryOpen = true;
+                }
+            });
+
+            window.addEventListener('popstate', () => {
+                noteReaderHistoryOpen = false;
+                if (noteImageOverlay.classList.contains('show')) {
+                    noteImageOverlay.classList.remove('show');
+                    document.body.classList.remove('note-image-open');
+                }
+            });
 
             let isScrubbing = false;
 
