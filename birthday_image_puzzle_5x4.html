@@ -918,17 +918,15 @@
                 const y = latestPointer.y;
                 const height = window.innerHeight;
 
-                // Wider, faster edge scrolling makes phone drag-and-drop
-                // practical when the pieces tray is far from the board.
-                const edge = 150;
+                const edge = 105;
                 let amount = 0;
 
                 if (y < edge) {
                     const intensity = Math.max(0, edge - y) / edge;
-                    amount = -Math.max(7, 38 * intensity);
+                    amount = -Math.max(2.5, 16 * intensity);
                 } else if (y > height - edge) {
                     const intensity = Math.max(0, y - (height - edge)) / edge;
-                    amount = Math.max(7, 38 * intensity);
+                    amount = Math.max(2.5, 16 * intensity);
                 }
 
                 if (amount !== 0) {
