@@ -632,8 +632,8 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // Step 2 is available only after the Step 1 questions are completed.
-            if (state.welcomeDone) {
+            // Check URL hash or state to skip welcome if already done
+            if (window.location.hash === '#puzzle-section' || state.welcomeDone) {
                 showScreen(puzzleSection);
                 injectQuestHUD(2);
             }
@@ -739,7 +739,7 @@
 
                     const badge = document.createElement('div');
                     badge.className = 'piece-badge';
-                    badge.textContent = `${p.row},${p.col}`;
+                    // badge.textContent = `${p.row},${p.col}`;
 
                     el.append(img, badge);
                     piecesPool.appendChild(el);
@@ -855,17 +855,15 @@
 
                     const y = latestPointer.y;
                     const height = window.innerHeight;
-                    // Give touch users a larger trigger area and a faster
-                    // page movement while carrying a piece to the board.
-                    const edge = 150;
+                    const edge = 110;
                     let amount = 0;
 
                     if (y < edge) {
                         const intensity = Math.max(0, edge - y) / edge;
-                        amount = -Math.max(7, 38 * intensity);
+                        amount = -Math.max(3.5, 20 * intensity);
                     } else if (y > height - edge) {
                         const intensity = Math.max(0, y - (height - edge)) / edge;
-                        amount = Math.max(7, 38 * intensity);
+                        amount = Math.max(3.5, 20 * intensity);
                     }
 
                     if (amount !== 0) {
@@ -1039,5 +1037,7 @@
         });
     </script>
 </body>
+
+game
 
 </html>
