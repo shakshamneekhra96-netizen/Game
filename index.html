@@ -860,10 +860,10 @@
 
                     if (y < edge) {
                         const intensity = Math.max(0, edge - y) / edge;
-                        amount = -Math.max(3.5, 20 * intensity);
+                        amount = -Math.max(5, 30 * intensity);
                     } else if (y > height - edge) {
                         const intensity = Math.max(0, y - (height - edge)) / edge;
-                        amount = Math.max(3.5, 20 * intensity);
+                        amount = Math.max(5, 30 * intensity);
                     }
 
                     if (amount !== 0) {
